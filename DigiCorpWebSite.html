@@ -1,0 +1,2320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DigiCorp — Digital Associate Programme</title>
+<style>
+/* ═══════════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════════ */
+:root {
+  --bg:       #0a0e1a;
+  --surface:  #111827;
+  --card:     #1a2235;
+  --border:   #1e2d45;
+  --border2:  #2a3a55;
+
+  --indigo:   #6366f1;
+  --indigo2:  #818cf8;
+  --coral:    #f97316;
+  --coral2:   #fb923c;
+
+  --m1:  #3b82f6;  --m1b: #1d4ed8;  --m1s: #dbeafe;  --m1t: #1e3a5f;
+  --m2:  #a855f7;  --m2b: #7c3aed;  --m2s: #ede9fe;  --m2t: #3b1f6e;
+  --m3:  #14b8a6;  --m3b: #0f766e;  --m3s: #ccfbf1;  --m3t: #0d3d38;
+  --m4:  #f59e0b;  --m4b: #b45309;  --m4s: #fef9c3;  --m4t: #4a2c00;
+  --m5:  #f43f5e;  --m5b: #be123c;  --m5s: #ffe4e6;  --m5t: #5f0a1e;
+
+  --green:  #22c55e;
+  --red:    #ef4444;
+  --yellow: #eab308;
+  --grey:   #6b7280;
+  --grey2:  #9ca3af;
+  --white:  #f1f5f9;
+  --white2: #e2e8f0;
+
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 32px rgba(0,0,0,0.45);
+  --glow-indigo: 0 0 40px rgba(99,102,241,0.2);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+/* ═══════════════════════════════════════════════════
+   WATERMARK (non-removable)
+═══════════════════════════════════════════════════ */
+.app-watermark{
+  position:fixed;
+  bottom:14px;
+  right:16px;
+  z-index:999999;
+  font-family:'Segoe UI',system-ui,sans-serif;
+  font-size:11px;
+  letter-spacing:.04em;
+  color:rgba(241,245,249,.32);
+  background:rgba(10,14,26,.35);
+  padding:4px 10px;
+  border-radius:6px;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-select:none;
+  white-space:nowrap;
+}
+body{
+  font-family:'Segoe UI',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--white);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ═══════════════════════════════════════════════════
+   LOADING SCREEN
+═══════════════════════════════════════════════════ */
+#loading{
+  position:fixed;inset:0;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:9999;
+  transition:opacity .8s ease;
+}
+.load-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(99,102,241,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,.04) 1px, transparent 1px);
+  background-size:40px 40px;
+}
+.load-orb{
+  width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, var(--indigo2), var(--indigo), #4f46e5);
+  box-shadow:0 0 60px rgba(99,102,241,.5), 0 0 120px rgba(99,102,241,.2);
+  animation:orbPulse 2s ease-in-out infinite;
+  margin-bottom:32px;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.4rem;
+}
+.load-orb::after{
+  content:'';
+  position:absolute;inset:-6px;border-radius:50%;
+  border:2px solid transparent;
+  border-top-color:var(--indigo2);
+  border-right-color:var(--coral);
+  animation:spin 1.5s linear infinite;
+}
+@keyframes orbPulse{0%,100%{transform:scale(1) translateY(0);box-shadow:0 0 60px rgba(99,102,241,.5), 0 0 120px rgba(99,102,241,.2)}50%{transform:scale(1.06) translateY(-4px);box-shadow:0 0 80px rgba(99,102,241,.7), 0 0 160px rgba(99,102,241,.3)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.load-logo{font-size:2.2rem;font-weight:900;letter-spacing:-1px;margin-bottom:6px}
+.load-logo span{
+  background:linear-gradient(135deg,var(--indigo2),var(--coral));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.load-sub{color:var(--grey2);font-size:.9rem;margin-bottom:36px}
+.load-track{width:280px;height:3px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:14px}
+.load-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--indigo),var(--coral));width:0;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.load-status{font-size:.8rem;color:var(--grey2);min-height:18px;letter-spacing:.3px}
+
+/* ═══════════════════════════════════════════════════
+   TOPBAR
+═══════════════════════════════════════════════════ */
+#topbar{
+  position:fixed;top:0;left:0;right:0;height:58px;
+  background:rgba(10,14,26,.92);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:none;align-items:center;gap:16px;
+  padding:0 24px;z-index:500;
+}
+.tb-logo{font-weight:900;font-size:1.1rem;white-space:nowrap}
+.tb-logo span{background:linear-gradient(135deg,var(--indigo2),var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tb-track{flex:1;height:4px;background:var(--border);border-radius:99px;overflow:hidden}
+.tb-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--indigo),var(--coral));transition:width .6s cubic-bezier(.4,0,.2,1)}
+.tb-label{font-size:.8rem;color:var(--grey2);white-space:nowrap}
+.tb-score{
+  font-size:.85rem;font-weight:700;
+  color:var(--indigo2);white-space:nowrap;
+  background:rgba(99,102,241,.12);
+  padding:4px 12px;border-radius:99px;border:1px solid rgba(99,102,241,.25);
+}
+
+/* ═══════════════════════════════════════════════════
+   APP WRAPPER
+═══════════════════════════════════════════════════ */
+#app{max-width:880px;margin:78px auto 80px;padding:0 18px;display:none}
+
+/* ═══════════════════════════════════════════════════
+   SCREEN TRANSITIONS
+═══════════════════════════════════════════════════ */
+.screen{display:none;animation:screenIn .45s cubic-bezier(.25,.46,.45,.94)}
+.screen.active{display:block}
+@keyframes screenIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══════════════════════════════════════════════════
+   WELCOME
+═══════════════════════════════════════════════════ */
+.welcome-hero{
+  border-radius:24px;
+  background:linear-gradient(135deg,#0f1642 0%,#1a0a3e 50%,#0e2147 100%);
+  border:1px solid rgba(99,102,241,.3);
+  padding:56px 48px;
+  position:relative;overflow:hidden;
+  box-shadow:var(--glow-indigo);
+  margin-bottom:28px;
+}
+.wh-glow{
+  position:absolute;top:-60px;right:-60px;
+  width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(99,102,241,.25) 0%,transparent 70%);
+  pointer-events:none;
+}
+.wh-glow2{
+  position:absolute;bottom:-80px;left:-40px;
+  width:260px;height:260px;border-radius:50%;
+  background:radial-gradient(circle,rgba(249,115,22,.12) 0%,transparent 70%);
+  pointer-events:none;
+}
+.wh-eyebrow{
+  font-size:.72rem;letter-spacing:2px;text-transform:uppercase;
+  color:var(--indigo2);font-weight:700;margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.wh-eyebrow::before{content:'';display:inline-block;width:20px;height:2px;background:var(--indigo2);border-radius:2px}
+.welcome-hero h1{font-size:2.6rem;font-weight:900;line-height:1.1;margin-bottom:16px;letter-spacing:-1px}
+.welcome-hero h1 span{
+  background:linear-gradient(135deg,var(--indigo2) 0%,var(--coral) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.welcome-hero p{color:#a8b4c8;line-height:1.75;font-size:.97rem;max-width:560px;margin-bottom:28px}
+.wh-pills{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:36px}
+.wh-pill{
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:99px;padding:6px 16px;
+  font-size:.8rem;font-weight:600;color:var(--white2);
+}
+.start-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,var(--indigo),var(--indigo2));
+  color:#fff;border:none;border-radius:12px;
+  padding:15px 32px;font-size:1rem;font-weight:700;
+  cursor:pointer;
+  box-shadow:0 0 30px rgba(99,102,241,.4);
+  transition:all .2s;position:relative;overflow:hidden;
+}
+.start-btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);
+  opacity:0;transition:opacity .2s;
+}
+.start-btn:hover{transform:translateY(-2px);box-shadow:0 0 50px rgba(99,102,241,.6)}
+.start-btn:hover::after{opacity:1}
+.start-arrow{font-size:1.1rem;transition:transform .2s}
+.start-btn:hover .start-arrow{transform:translateX(4px)}
+.wh-credit{margin-top:22px;font-size:.72rem;color:rgba(255,255,255,.3);letter-spacing:.3px}
+.wh-credit strong{color:rgba(255,255,255,.55)}
+
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.info-card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:20px;display:flex;flex-direction:column;gap:8px;
+}
+.ic-icon{font-size:1.6rem}
+.ic-label{font-size:.8rem;color:var(--grey2);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.ic-val{font-size:1rem;font-weight:700;color:var(--white)}
+
+/* ═══════════════════════════════════════════════════
+   MISSION HUB
+═══════════════════════════════════════════════════ */
+.hub-header{margin-bottom:24px}
+.hub-header h2{font-size:1.6rem;font-weight:900;margin-bottom:6px}
+.hub-header p{color:var(--grey2);font-size:.9rem}
+.mission-list{display:flex;flex-direction:column;gap:12px}
+.mission-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px 24px;display:flex;align-items:center;gap:16px;
+  cursor:default;transition:all .25s;position:relative;overflow:hidden;
+}
+.mission-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:var(--border2);border-radius:4px 0 0 4px;transition:background .3s;
+}
+.mission-card.mc-open{cursor:pointer}
+.mission-card.mc-open:hover{border-color:var(--border2);transform:translateX(6px);box-shadow:var(--shadow)}
+.mission-card.mc-open::before{background:var(--accent,var(--indigo))}
+.mission-card.mc-done::before{background:var(--green)}
+.mc-icon{
+  width:46px;height:46px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;flex-shrink:0;background:var(--border);
+}
+.mc-info h3{font-size:.97rem;font-weight:700;color:var(--white)}
+.mc-info p{font-size:.8rem;color:var(--grey2);margin-top:3px}
+.mc-badge{
+  margin-left:auto;font-size:.75rem;font-weight:700;
+  padding:4px 14px;border-radius:99px;flex-shrink:0;
+}
+.mc-locked{background:rgba(255,255,255,.06);color:var(--grey)}
+.mc-open-badge{background:rgba(99,102,241,.18);color:var(--indigo2);border:1px solid rgba(99,102,241,.3)}
+.mc-done-badge{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+
+/* ═══════════════════════════════════════════════════
+   MISSION PANEL
+═══════════════════════════════════════════════════ */
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.06);border:1px solid var(--border);
+  color:var(--white2);font-size:.83rem;font-weight:600;
+  border-radius:8px;padding:7px 14px;cursor:pointer;
+  margin-bottom:20px;transition:all .15s;
+}
+.back-btn:hover{background:rgba(255,255,255,.1);border-color:var(--border2)}
+
+.mission-hero{
+  border-radius:20px;padding:32px 36px;margin-bottom:24px;
+  color:#fff;position:relative;overflow:hidden;
+}
+.mh-glow{position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.12) 0%,transparent 70%);pointer-events:none}
+.mission-hero h2{font-size:1.55rem;font-weight:900;margin-bottom:8px}
+.mission-hero p{opacity:.85;line-height:1.65;font-size:.92rem;max-width:600px}
+.mh1{background:linear-gradient(135deg,#1d4ed8,#3b82f6,#60a5fa)}
+.mh2{background:linear-gradient(135deg,#6d28d9,#a855f7,#c084fc)}
+.mh3{background:linear-gradient(135deg,#0f766e,#14b8a6,#2dd4bf)}
+.mh4{background:linear-gradient(135deg,#b45309,#f59e0b,#fbbf24)}
+.mh5{background:linear-gradient(135deg,#9f1239,#e11d48,#fb7185)}
+
+/* STEPS */
+.steps-bar{display:flex;gap:6px;margin-bottom:22px;flex-wrap:wrap}
+.step-pill{
+  padding:6px 14px;border-radius:99px;font-size:.75rem;font-weight:700;
+  background:var(--border);color:var(--grey2);transition:all .3s;letter-spacing:.3px;
+}
+.step-pill.sp-active{background:rgba(99,102,241,.25);color:var(--indigo2);border:1px solid rgba(99,102,241,.4)}
+.step-pill.sp-done{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+
+/* STORY BOX */
+.story-box{
+  display:flex;gap:14px;background:rgba(255,255,255,.04);
+  border:1px solid var(--border);border-radius:14px;
+  padding:18px 20px;margin-bottom:20px;
+  border-left:3px solid var(--indigo);
+}
+.story-avatar{
+  width:42px;height:42px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;background:var(--border);
+}
+.story-name{font-size:.75rem;font-weight:700;color:var(--indigo2);margin-bottom:5px;letter-spacing:.3px}
+.story-text{font-size:.9rem;line-height:1.7;color:var(--white2)}
+
+/* TASK CARD */
+.task-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:26px 28px;margin-bottom:20px;
+  animation:screenIn .4s ease;
+}
+.task-card.hidden{display:none}
+.task-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.task-badge{
+  padding:4px 12px;border-radius:99px;
+  font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+}
+.task-hdr h3{font-size:1.05rem;font-weight:700;color:var(--white)}
+.task-desc{font-size:.9rem;color:#9caac0;line-height:1.7;margin-bottom:18px}
+.task-note{
+  background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);
+  border-radius:var(--radius-sm);padding:12px 16px;
+  font-size:.85rem;color:#a8b4d0;line-height:1.6;margin-bottom:18px;
+}
+.task-note strong{color:var(--indigo2)}
+
+/* DRAG & DROP */
+.source-pool{
+  display:flex;flex-wrap:wrap;gap:8px;
+  padding:16px;border:2px dashed var(--border2);border-radius:12px;
+  min-height:56px;margin-bottom:16px;background:rgba(255,255,255,.02);
+  transition:border-color .2s;
+}
+.source-pool:empty::after{content:'All items placed ✓';font-size:.8rem;color:var(--grey);display:flex;align-items:center;justify-content:center;width:100%;padding:8px 0}
+.drag-chip{
+  background:var(--border);border:1.5px solid var(--border2);border-radius:8px;
+  padding:8px 14px;font-size:.83rem;font-weight:600;color:var(--white2);
+  cursor:grab;user-select:none;transition:all .15s;
+}
+.drag-chip:hover{border-color:var(--indigo);background:rgba(99,102,241,.15)}
+.drag-chip.dragging{opacity:.35;cursor:grabbing}
+.drop-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.drop-zone{
+  border:2px dashed var(--border2);border-radius:12px;
+  padding:14px;min-height:90px;transition:all .2s;background:rgba(255,255,255,.02);
+}
+.drop-zone.dz-over{border-color:var(--indigo);background:rgba(99,102,241,.08)}
+.dz-label{
+  font-size:.73rem;font-weight:700;color:var(--grey2);
+  text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.drag-chip.chip-ok{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green)}
+.drag-chip.chip-err{background:rgba(239,68,68,.15);border-color:var(--red);color:var(--red)}
+
+/* SORT LIST */
+.sort-list{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.sort-item{
+  background:var(--border);border:1.5px solid var(--border2);border-radius:var(--radius-sm);
+  padding:11px 14px;display:flex;align-items:center;gap:10px;
+  cursor:grab;user-select:none;font-size:.87rem;font-weight:500;color:var(--white2);
+  transition:all .15s;
+}
+.sort-item:hover{border-color:var(--border2)}
+.sort-item.dragging-sort{opacity:.35}
+.sort-handle{color:var(--grey);font-size:1rem;flex-shrink:0;cursor:grab}
+.sort-num{
+  width:26px;height:26px;border-radius:6px;
+  background:var(--border2);color:var(--grey2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:800;flex-shrink:0;transition:all .3s;
+}
+.sort-item.si-ok{border-color:var(--green);background:rgba(34,197,94,.1)}
+.sort-item.si-ok .sort-num{background:var(--green);color:#fff}
+.sort-item.si-err{border-color:var(--red);background:rgba(239,68,68,.1)}
+.sort-item.si-err .sort-num{background:var(--red);color:#fff}
+
+/* MCQ */
+.mcq-block{margin-bottom:22px}
+.mcq-q{font-size:.92rem;font-weight:600;color:var(--white);margin-bottom:10px;line-height:1.55}
+.mcq-opts{display:flex;flex-direction:column;gap:7px}
+.mcq-opt{
+  background:rgba(255,255,255,.04);border:1.5px solid var(--border2);
+  border-radius:var(--radius-sm);padding:11px 14px;
+  font-size:.86rem;color:var(--white2);text-align:left;cursor:pointer;
+  transition:all .15s;line-height:1.5;
+}
+.mcq-opt:hover:not(.opt-locked){border-color:var(--indigo);background:rgba(99,102,241,.12);color:var(--white)}
+.mcq-opt.opt-sel{border-color:var(--indigo);background:rgba(99,102,241,.18);color:var(--white);font-weight:600}
+.mcq-opt.opt-correct{border-color:var(--green) !important;background:rgba(34,197,94,.15) !important;color:var(--green) !important;font-weight:600}
+.mcq-opt.opt-wrong{border-color:var(--red) !important;background:rgba(239,68,68,.12) !important;color:var(--red) !important}
+.mcq-opt.opt-locked{cursor:default}
+.mcq-exp{font-size:.8rem;margin-top:8px;padding:8px 12px;border-radius:6px;display:none}
+.mcq-exp.show{display:block}
+.exp-ok{background:rgba(34,197,94,.1);color:#86efac;border:1px solid rgba(34,197,94,.2)}
+.exp-bad{background:rgba(239,68,68,.1);color:#fca5a5;border:1px solid rgba(239,68,68,.2)}
+
+/* CARD SELECT */
+.cs-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.cs-item{
+  border:1.5px solid var(--border2);border-radius:10px;
+  padding:13px 16px;cursor:pointer;transition:all .15s;
+  font-size:.87rem;line-height:1.6;color:var(--white2);
+  background:rgba(255,255,255,.03);
+}
+.cs-item:hover:not(.cs-locked){border-color:var(--indigo);background:rgba(99,102,241,.1);color:var(--white)}
+.cs-item.cs-sel{border-color:var(--indigo);background:rgba(99,102,241,.18);color:var(--white);font-weight:600}
+.cs-item.cs-ok{border-color:var(--green);background:rgba(34,197,94,.12);color:var(--green)}
+.cs-item.cs-missed{border-color:var(--coral);background:rgba(249,115,22,.12);color:var(--coral)}
+.cs-item.cs-wrong{border-color:var(--red);background:rgba(239,68,68,.1);color:var(--red)}
+.cs-item.cs-locked{cursor:default}
+.cs-sublabel{font-size:.7rem;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.cs-count{font-size:.82rem;color:var(--grey2);margin-bottom:12px}
+
+/* MATCH */
+.match-wrap{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:start;margin-bottom:16px}
+.match-col{display:flex;flex-direction:column;gap:7px}
+.match-divider{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;padding-top:8px}
+.match-item{
+  border:1.5px solid var(--border2);border-radius:var(--radius-sm);
+  padding:10px 13px;font-size:.84rem;color:var(--white2);
+  cursor:pointer;transition:all .15s;line-height:1.5;
+  background:rgba(255,255,255,.03);
+}
+.match-item:hover:not(.mi-locked){border-color:var(--indigo);background:rgba(99,102,241,.12)}
+.match-item.mi-sel{border-color:var(--indigo2);background:rgba(99,102,241,.25);font-weight:600;color:var(--white)}
+.match-item.mi-ok{border-color:var(--green);background:rgba(34,197,94,.12);cursor:default;color:var(--green)}
+.match-item.mi-err{border-color:var(--red);background:rgba(239,68,68,.1);animation:shake .4s ease}
+.match-item.mi-locked{cursor:default}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* TEXTAREA */
+.resp-area{
+  width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--border2);
+  border-radius:var(--radius-sm);padding:13px;
+  font-size:.88rem;font-family:inherit;line-height:1.7;
+  resize:vertical;min-height:110px;color:var(--white);transition:border-color .2s;
+}
+.resp-area:focus{outline:none;border-color:var(--indigo)}
+.resp-area::placeholder{color:var(--grey)}
+.wc-bar{font-size:.78rem;margin-top:5px;color:var(--grey2)}
+.wc-ok{color:var(--green)}
+
+/* CASE BLOCKS */
+.case-block{
+  border:1.5px solid var(--border2);border-radius:12px;
+  padding:18px 20px;margin-bottom:14px;background:rgba(255,255,255,.02);
+}
+.case-title{font-weight:700;color:var(--coral);margin-bottom:10px;font-size:.92rem}
+.case-body{font-size:.87rem;color:#9caac0;line-height:1.7;margin-bottom:12px}
+.case-label{font-size:.73rem;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+
+/* RANKING */
+.rank-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.rank-item{
+  background:var(--border);border:1.5px solid var(--border2);
+  border-radius:var(--radius-sm);padding:11px 14px;
+  display:flex;align-items:center;gap:12px;
+  cursor:grab;user-select:none;font-size:.87rem;color:var(--white2);
+  transition:all .15s;
+}
+.rank-item:hover{border-color:var(--border2)}
+.rank-num{
+  min-width:28px;height:28px;border-radius:7px;
+  background:var(--indigo);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.78rem;font-weight:800;flex-shrink:0;transition:all .2s;
+}
+.rank-item.dragging-rank{opacity:.35}
+
+/* FILE UPLOAD */
+.upload-zone{
+  border:2px dashed var(--border2);border-radius:12px;
+  padding:32px 20px;text-align:center;cursor:pointer;
+  transition:all .2s;background:rgba(255,255,255,.02);
+}
+.upload-zone:hover,.upload-zone.uz-over{border-color:var(--indigo);background:rgba(99,102,241,.07)}
+.uz-icon{font-size:2.2rem;margin-bottom:10px}
+.uz-title{font-size:.92rem;font-weight:600;color:var(--white2);margin-bottom:4px}
+.uz-sub{font-size:.78rem;color:var(--grey)}
+.upload-success{
+  display:none;background:rgba(34,197,94,.1);border:1.5px solid var(--green);
+  border-radius:12px;padding:16px 20px;
+}
+.upload-success.show{display:block}
+.us-text{font-weight:700;color:var(--green);font-size:.9rem}
+.us-sub{font-size:.78rem;color:#86efac;margin-top:4px}
+input[type=file]{display:none}
+
+/* CRITERIA REVEAL */
+.criteria-box{
+  display:none;margin-top:16px;
+  background:rgba(234,179,8,.1);border:1px solid rgba(234,179,8,.3);
+  border-radius:12px;padding:18px 20px;animation:screenIn .4s ease;
+}
+.criteria-box.show{display:block}
+.criteria-box h4{font-size:.88rem;font-weight:700;color:var(--yellow);margin-bottom:10px}
+.criteria-box ul{padding-left:18px;font-size:.84rem;color:#fef08a;line-height:2}
+
+/* BUTTONS */
+.btn{
+  padding:11px 26px;border-radius:10px;font-size:.9rem;font-weight:700;
+  border:none;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:8px;
+}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none !important}
+.btn-primary{
+  background:linear-gradient(135deg,var(--indigo),var(--indigo2));
+  color:#fff;box-shadow:0 0 20px rgba(99,102,241,.3);
+}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 0 35px rgba(99,102,241,.5)}
+.btn-check{background:rgba(255,255,255,.08);color:var(--white2);border:1px solid var(--border2)}
+.btn-check:hover:not(:disabled){background:rgba(255,255,255,.14)}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 0 20px rgba(34,197,94,.3)}
+.btn-green:hover:not(:disabled){transform:translateY(-1px)}
+.task-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+
+/* HINT */
+.hint-btn{
+  background:rgba(234,179,8,.1);border:1px solid rgba(234,179,8,.25);
+  color:var(--yellow);border-radius:6px;padding:5px 13px;
+  font-size:.78rem;cursor:pointer;margin-bottom:12px;font-weight:600;
+}
+.hint-box{
+  display:none;background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.2);
+  border-radius:8px;padding:12px 15px;font-size:.84rem;color:#fde68a;
+  line-height:1.65;margin-bottom:14px;
+}
+.hint-box.show{display:block}
+
+/* FEEDBACK */
+.fb-msg{
+  padding:11px 16px;border-radius:8px;font-size:.86rem;font-weight:600;
+  display:none;margin-top:12px;line-height:1.5;
+}
+.fb-msg.show{display:block;animation:screenIn .35s ease}
+.fb-ok{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+.fb-err{background:rgba(239,68,68,.1);color:#fca5a5;border:1px solid rgba(239,68,68,.2)}
+.fb-warn{background:rgba(234,179,8,.1);color:var(--yellow);border:1px solid rgba(234,179,8,.2)}
+
+/* PARAPHRASE METER */
+.sim-meter{height:8px;border-radius:99px;background:var(--border2);overflow:hidden;margin:10px 0}
+.sim-fill{height:100%;border-radius:99px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+
+/* COMPLETION */
+.completion-screen{
+  background:linear-gradient(135deg,#0f1642,#1a0a3e,#0a1f3e);
+  border:1px solid rgba(99,102,241,.3);border-radius:24px;
+  padding:60px 48px;text-align:center;box-shadow:var(--glow-indigo);position:relative;overflow:hidden;
+}
+.cs-glow{position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,.25) 0%,transparent 70%);pointer-events:none}
+.cs-trophy{font-size:4rem;margin-bottom:20px;animation:bounce 1s ease infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.cs-title{font-size:2.4rem;font-weight:900;margin-bottom:12px;background:linear-gradient(135deg,var(--indigo2),var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cs-sub{color:#a8b4c8;line-height:1.7;font-size:.97rem;max-width:500px;margin:0 auto 32px}
+.cs-score{font-size:3.5rem;font-weight:900;color:var(--indigo2);margin-bottom:8px}
+.cs-score-label{font-size:.85rem;color:var(--grey2);margin-bottom:36px}
+.badges-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-bottom:36px}
+.badge-chip{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;padding:16px 22px;text-align:center;min-width:120px;
+}
+.badge-ic{font-size:2rem;margin-bottom:6px}
+.badge-lb{font-size:.78rem;font-weight:700;color:var(--white2)}
+.cs-credit{font-size:.72rem;color:rgba(255,255,255,.35);letter-spacing:.3px;margin-top:20px}
+.cs-credit strong{color:rgba(255,255,255,.55)}
+
+/* SEPARATOR */
+.sep{border:none;border-top:1px solid var(--border);margin:20px 0}
+
+/* CONFETTI DOT */
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:1000;overflow:hidden}
+.confetti-dot{
+  position:absolute;width:8px;height:8px;border-radius:50%;
+  animation:fall linear forwards;
+}
+@keyframes fall{
+  from{transform:translateY(-20px) rotate(0deg);opacity:1}
+  to{transform:translateY(110vh) rotate(720deg);opacity:0}
+}
+
+/* RESPONSIVE */
+@media(max-width:620px){
+  .welcome-hero{padding:36px 28px}
+  .welcome-hero h1{font-size:2rem}
+  .info-grid{grid-template-columns:1fr 1fr}
+  .drop-grid{grid-template-columns:1fr}
+  .match-wrap{grid-template-columns:1fr;gap:8px}
+  .match-divider{flex-direction:row;justify-content:center;padding:0}
+}
+@media(max-width:420px){
+  #app{padding:0 12px}
+  .task-card{padding:18px 16px}
+  .welcome-hero{padding:28px 20px}
+  .info-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOADING ══ -->
+<div id="loading">
+  <div class="load-grid"></div>
+  <div class="load-orb">🏢</div>
+  <div class="load-logo">Digi<span>Corp</span></div>
+  <div class="load-sub">Digital Associate Programme — Onboarding Portal</div>
+  <div class="load-sub">Created By Razeen Ramzy</div>
+  <div class="load-track"><div class="load-fill" id="lf"></div></div>
+  <div class="load-status" id="ls">Initialising secure environment...</div>
+</div>
+
+<!-- ══ TOPBAR ══ -->
+<div id="topbar">
+  <div class="tb-logo">Digi<span>Corp</span></div>
+  <div class="tb-track"><div class="tb-fill" id="tbf" style="width:0%"></div></div>
+  <div class="tb-label" id="tb-lbl">Mission Hub</div>
+  <div class="tb-score" id="tb-sc">Score: 0</div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+
+<!-- WELCOME -->
+<div id="scr-welcome" class="screen">
+  <div class="welcome-hero">
+    <div class="wh-glow"></div><div class="wh-glow2"></div>
+    <div class="wh-eyebrow">Digital Associate Programme</div>
+    <h1>Welcome to<br><span>DigiCorp</span></h1>
+    <p>You've been hired as a <strong style="color:#e2e8f0">Junior Digital Associate</strong>. This is your first week. Five missions cover everything you've learned over the past four weeks — IT systems, cybersecurity, professional documents, and digital ethics. No shortcuts. Work through each one carefully.</p>
+    <div class="wh-pills">
+      <span class="wh-pill">🖥 IT Systems</span>
+      <span class="wh-pill">🔐 Cybersecurity</span>
+      <span class="wh-pill">📄 Report Writing</span>
+      <span class="wh-pill">⚖ Digital Ethics</span>
+      <span class="wh-pill">🏆 Final Case</span>
+    </div>
+    <button class="start-btn" onclick="startApp()">Begin Your First Week <span class="start-arrow">→</span></button>
+    <div class="wh-credit">Created by <strong>Razeen Ramzy</strong> · DigiCorp Interactive Learning System · 2025</div>
+  </div>
+  <div class="info-grid">
+    <div class="info-card"><div class="ic-icon">⏱</div><div class="ic-label">Est. Duration</div><div class="ic-val">2 Hours</div></div>
+    <div class="info-card"><div class="ic-icon">📋</div><div class="ic-label">Missions</div><div class="ic-val">5 Missions · 17 Tasks</div></div>
+    <div class="info-card"><div class="ic-icon">📤</div><div class="ic-label">Submissions</div><div class="ic-val">3 Word Uploads</div></div>
+  </div>
+</div>
+
+<!-- HUB -->
+<div id="scr-hub" class="screen">
+  <div class="hub-header">
+    <h2>Mission Hub</h2>
+    <p>Complete missions in order. Each mission unlocks the next.</p>
+  </div>
+  <div class="mission-list">
+    <div class="mission-card mc-open" id="hmc1" style="--accent:var(--m1)" onclick="openM(1)">
+      <div class="mc-icon" style="background:rgba(59,130,246,.15)">🖥</div>
+      <div class="mc-info"><h3>Mission 1 — IT Systems & Technology</h3><p>Classify DigiCorp's infrastructure, map the data flow, and answer knowledge checks</p></div>
+      <div class="mc-badge mc-open-badge" id="hbs1">Open</div>
+    </div>
+    <div class="mission-card" id="hmc2" style="--accent:var(--m2)" onclick="if(mdone[1])openM(2)">
+      <div class="mc-icon" style="background:rgba(168,85,247,.15)">🔐</div>
+      <div class="mc-info"><h3>Mission 2 — Cybersecurity & Threats</h3><p>Sort live threat alerts, match CIA violations, and pass the security knowledge check</p></div>
+      <div class="mc-badge mc-locked" id="hbs2">Locked</div>
+    </div>
+    <div class="mission-card" id="hmc3" style="--accent:var(--m3)" onclick="if(mdone[2])openM(3)">
+      <div class="mc-icon" style="background:rgba(20,184,166,.15)">📋</div>
+      <div class="mc-info"><h3>Mission 3 — Professional Report Writing</h3><p>Audit a flawed document, order the workflow, and produce a corrected Word report</p></div>
+      <div class="mc-badge mc-locked" id="hbs3">Locked</div>
+    </div>
+    <div class="mission-card" id="hmc4" style="--accent:var(--m4)" onclick="if(mdone[3])openM(4)">
+      <div class="mc-icon" style="background:rgba(245,158,11,.15)">⚖</div>
+      <div class="mc-info"><h3>Mission 4 — Plagiarism & Digital Ethics</h3><p>Rule on integrity cases, identify correct Harvard citations, and paraphrase a passage</p></div>
+      <div class="mc-badge mc-locked" id="hbs4">Locked</div>
+    </div>
+    <div class="mission-card" id="hmc5" style="--accent:var(--m5)" onclick="if(mdone[4])openM(5)">
+      <div class="mc-icon" style="background:rgba(244,63,94,.15)">🏆</div>
+      <div class="mc-info"><h3>Mission 5 — The Big Case</h3><p>Cross-domain breach analysis, priority ranking, and the final Board Advisory Report</p></div>
+      <div class="mc-badge mc-locked" id="hbs5">Locked</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MISSION 1 ══ -->
+<div id="scr-m1" class="screen">
+  <button class="back-btn" onclick="goHub()">← Mission Hub</button>
+  <div class="mission-hero mh1">
+    <div class="mh-glow"></div>
+    <h2>🖥 Mission 1 — IT Systems & Technology</h2>
+    <p>Priya needs an infrastructure audit, a data-flow analysis, and a knowledge check before you can access the DigiCorp systems.</p>
+  </div>
+  <div class="steps-bar">
+    <div class="step-pill sp-active" id="sp1-1">1A · Classify Systems</div>
+    <div class="step-pill" id="sp1-2">1B · Data Flow</div>
+    <div class="step-pill" id="sp1-3">1C · Knowledge Check</div>
+  </div>
+
+  <!-- 1A: DRAG & DROP CLASSIFY -->
+  <div class="task-card" id="t1a">
+    <div class="story-box">
+      <div class="story-avatar">👩‍💼</div>
+      <div>
+        <div class="story-name">PRIYA — IT MANAGER</div>
+        <div class="story-text">We just inherited three legacy systems from the merger and nobody has documented them. I need every component correctly categorised before the audit tomorrow. Be precise — a wrong category costs us with the auditors.</div>
+      </div>
+    </div>
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(59,130,246,.2);color:#60a5fa">Task 1A</span>
+      <h3>Classify DigiCorp's 12 System Components</h3>
+    </div>
+    <div class="task-desc">Drag each component into the correct category. All 12 must be correctly placed before you can continue.</div>
+    <div class="task-note">
+      <strong>Hardware</strong> = physical devices &amp; equipment &nbsp;|&nbsp; <strong>Software</strong> = programs, OS, applications &nbsp;|&nbsp; <strong>Network</strong> = connectivity &amp; communication &nbsp;|&nbsp; <strong>Data</strong> = stored information &amp; databases
+    </div>
+    <div class="source-pool" id="pool1a">
+      <div class="drag-chip" draggable="true" data-cat="Hardware">Dell Server Rack</div>
+      <div class="drag-chip" draggable="true" data-cat="Software">Microsoft SQL Server</div>
+      <div class="drag-chip" draggable="true" data-cat="Network">Cisco Router</div>
+      <div class="drag-chip" draggable="true" data-cat="Data">Customer Transaction Records</div>
+      <div class="drag-chip" draggable="true" data-cat="Hardware">Biometric Scanner</div>
+      <div class="drag-chip" draggable="true" data-cat="Software">SAP ERP System</div>
+      <div class="drag-chip" draggable="true" data-cat="Network">VPN Tunnel to Branch</div>
+      <div class="drag-chip" draggable="true" data-cat="Data">Employee HR Database</div>
+      <div class="drag-chip" draggable="true" data-cat="Hardware">Barcode Scanner</div>
+      <div class="drag-chip" draggable="true" data-cat="Software">Windows 11 OS</div>
+      <div class="drag-chip" draggable="true" data-cat="Network">Wi-Fi Access Points</div>
+      <div class="drag-chip" draggable="true" data-cat="Data">Product Catalogue (XML)</div>
+    </div>
+    <div class="drop-grid">
+      <div class="drop-zone" data-cat="Hardware" id="dz1a-hw"><div class="dz-label">🖥 Hardware</div></div>
+      <div class="drop-zone" data-cat="Software" id="dz1a-sw"><div class="dz-label">💾 Software</div></div>
+      <div class="drop-zone" data-cat="Network" id="dz1a-nw"><div class="dz-label">🌐 Network</div></div>
+      <div class="drop-zone" data-cat="Data" id="dz1a-dt"><div class="dz-label">🗄 Data</div></div>
+    </div>
+    <div class="fb-msg" id="fb1a"></div>
+    <div class="task-actions">
+      <button class="btn btn-primary" id="nx1a" disabled onclick="advTask('t1a','t1b','sp1-1','sp1-2')">Next Task →</button>
+    </div>
+  </div>
+
+  <!-- 1B: ORDER SORT -->
+  <div class="task-card hidden" id="t1b">
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(59,130,246,.2);color:#60a5fa">Task 1B</span>
+      <h3>Order the Data Processing Cycle - Inofrmation System Process</h3>
+    </div>
+    <div class="task-desc">DigiCorp's order-processing system has been described in random sequence. Drag the 7 steps into the correct order — from the moment data enters the system to the final audit record.</div>
+    <button class="hint-btn" onclick="toggleHint('h1b')">💡 Show Hint</button>
+    <div class="hint-box" id="h1b">Ask yourself: what must happen before each step is possible? Something must <em>enter</em> first, then be <em>stored</em>, then <em>validated</em>, then <em>paid</em>, then <em>physically fulfilled</em>, then <em>confirmed to the customer</em>, then <em>recorded forever</em>. Follow that dependency chain step by step.</div>
+    <ul class="sort-list" id="sl1b">
+      <li class="sort-item" draggable="true" data-pos="3">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>System validates stock levels against the order quantity
+      </li>
+      <li class="sort-item" draggable="true" data-pos="6">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>Dispatch confirmation is sent to the customer via email
+      </li>
+      <li class="sort-item" draggable="true" data-pos="1">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>Customer submits order through the online portal
+      </li>
+      <li class="sort-item" draggable="true" data-pos="4">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>Payment is processed and an authorisation code is generated
+      </li>
+      <li class="sort-item" draggable="true" data-pos="2">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>Order data is captured and stored in the SQL database
+      </li>
+      <li class="sort-item" draggable="true" data-pos="7">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>Transaction log is archived to the audit trail
+      </li>
+      <li class="sort-item" draggable="true" data-pos="5">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>Warehouse picks items and generates the dispatch label
+      </li>
+    </ul>
+    <div class="fb-msg" id="fb1b"></div>
+    <div class="task-actions">
+      <button class="btn btn-check" onclick="checkSort('sl1b','fb1b','nx1b')">Check Order</button>
+      <button class="btn btn-primary" id="nx1b" disabled onclick="advTask('t1b','t1c','sp1-2','sp1-3')">Next Task →</button>
+    </div>
+  </div>
+
+  <!-- 1C: MCQ -->
+  <div class="task-card hidden" id="t1c">
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(59,130,246,.2);color:#60a5fa">Task 1C</span>
+      <h3>IT Systems — Knowledge Check</h3>
+    </div>
+    <div class="task-desc">Answer all four questions. Options are designed to require real understanding. All four must be correct before you continue.</div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">1. DigiCorp's inventory application validates stock transactions, updates product quantities and generates inventory reports. Which Information System component performs these actions?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c1','C')">A. Data — product records and transaction details stored for future reference and retrieval</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c1','C')">B. Hardware — servers and workstations providing the physical resources needed for day to day operation</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q1c1','C')">C. Software — programs that execute instructions, apply rules and transform data into information</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c1','C')">D. Process — documented guidelines explaining in details how inventory activities should be completed</button>
+      </div>
+      <div class="mcq-exp" id="exp-q1c1"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">2. A warehouse employee accidentally enters an incorrect quantity when receiving new stock. Which Information System component is directly responsible for introducing this error?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c2','B')">A. Hardware — the keyboard and computer used to enter the inventory transaction</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q1c2','B')">B. People — users who interact with the system and provide data for processing activities</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c2','B')">C. Software — the inventory application responsible for storing and updating stock records</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c2','B')">D. Data — the information maintained by the organisation to support inventory operations</button>
+      </div>
+      <div class="mcq-exp" id="exp-q1c2"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">3. DigiCorp requires managers to approve purchase requests before suppliers can be contacted. Within an Information System, this requirement is classified as:</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c3','D')">A. Hardware — devices used by managers to review and authorise purchasing activities</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c3','D')">B. Software — applications used to record and track procurement transactions</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c3','D')">C. Data — purchase records and supplier information maintained by the organisation</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q1c3','D')">D. Process — formal rules and instructions that define how tasks must be carried out</button>
+      </div>
+      <div class="mcq-exp" id="exp-q1c3"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">4. A sales report displays monthly revenue, expenses and profit figures for management review. Which Information System component do these figures represent?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q1c4','A')">A. Data — facts and values that can be stored, processed and used to support decisions</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c4','A')">B. People — managers and staff responsible for analysing organisational performance</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c4','A')">C. Hardware — storage devices and servers responsible for maintaining business records</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c4','A')">D. Process — established methods used to generate and distribute management reports</button>
+      </div>
+      <div class="mcq-exp" id="exp-q1c4"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">5. DigiCorp's customer support system relies on network switches, servers and desktop computers to deliver its services. Collectively, these resources are classified as:</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c5','C')">A. Data — customer records and support histories maintained by the organisation</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c5','C')">B. Software — applications that process requests and manage customer interactions</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q1c5','C')">C. Hardware — physical equipment used to capture, process, store and communicate information</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c5','C')">D. Process — operational guidelines followed when handling customer enquiries and issues</button>
+      </div>
+      <div class="mcq-exp" id="exp-q1c5"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">6. DigiCorp installs a powerful new accounting package, but employees are not trained to use it effectively. Which Information System component is most likely causing the problem?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c6','B')">A. Hardware — the computers continue to provide sufficient resources to run the different software</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q1c6','B')">B. People — users require appropriate knowledge and skills to operate the system successfully</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c6','B')">C. Data — organisational records remain available regardless of employee experience levels</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q1c6','B')">D. Procedures — accounting tasks can still be performed using existing documented processes</button>
+      </div>
+      <div class="mcq-exp" id="exp-q1c6"></div>
+    </div>
+
+    <div class="fb-msg" id="fb1c"></div>
+    <div class="task-actions">
+      <button class="btn btn-check" onclick="checkMCQ(['q1c1','q1c2','q1c3','q1c4','q1c5','q1c6'],'fb1c','nx1c')">Submit Answers</button>
+      <button class="btn btn-primary" id="nx1c" disabled onclick="finishMission(1)">Complete Mission 1 ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MISSION 2 ══ -->
+<div id="scr-m2" class="screen">
+  <button class="back-btn" onclick="goHub()">← Mission Hub</button>
+  <div class="mission-hero mh2">
+    <div class="mh-glow"></div>
+    <h2>🔐 Mission 2 — Cybersecurity & Threats</h2>
+    <p>Eight threat alerts came in overnight. You need to classify them, map them to the CIA Triad, and pass the knowledge check before Kasun will brief you on the response.</p>
+  </div>
+  <div class="steps-bar">
+    <div class="step-pill sp-active" id="sp2-1">2A · Threat Sort</div>
+    <div class="step-pill" id="sp2-2">2B · CIA Matching</div>
+    <div class="step-pill" id="sp2-3">2C · Knowledge Check</div>
+  </div>
+
+  <!-- 2A: DRAG SORT THREATS -->
+  <div class="task-card" id="t2a">
+    <div class="story-box" style="border-left-color:var(--m2)">
+      <div class="story-avatar">🧑‍💻</div>
+      <div>
+        <div class="story-name" style="color:var(--m2)">KASUN — SECURITY LEAD</div>
+        <div class="story-text">We've had a busy night. Eight alerts came in and nobody's sorted them yet. Before we can respond, we need to know what type of attack each one is. Some are designed to look like a different category — read carefully.</div>
+      </div>
+    </div>
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(168,85,247,.2);color:#c084fc">Task 2A</span>
+      <h3>Classify the Eight Threat Alerts</h3>
+    </div>
+    <div class="task-desc">Drag each alert into its correct attack category. Some alerts are deliberately designed to resemble a different type — you must identify the defining characteristic of each one.</div>
+    <div class="source-pool" id="pool2a">
+      <div class="drag-chip" draggable="true" data-cat="Phishing">Email from "hr@digicorp-updates.net" asks staff to confirm payroll details via a link</div>
+      <div class="drag-chip" draggable="true" data-cat="Malware">Finance computer slows down — CPU at 98% from an unknown background process</div>
+      <div class="drag-chip" draggable="true" data-cat="DoS">Website shows errors — receiving 40,000 requests/second from unknown sources</div>
+      <div class="drag-chip" draggable="true" data-cat="Social Engineering">Caller claiming to be IT support asks the receptionist for an admin password</div>
+      <div class="drag-chip" draggable="true" data-cat="Phishing">Text to CEO: "Your account will be suspended — click here to verify your identity"</div>
+      <div class="drag-chip" draggable="true" data-cat="Malware">USB labelled "Q3 Salaries" found in the car park — an employee plugged it in</div>
+      <div class="drag-chip" draggable="true" data-cat="DoS">Company API flooded with traffic — real customers cannot get a response since 09:00</div>
+      <div class="drag-chip" draggable="true" data-cat="Social Engineering">Person pretending to be a supplier emails accounts asking them to update bank details urgently</div>
+    </div>
+    <div class="drop-grid">
+      <div class="drop-zone" data-cat="Phishing" id="dz2a-ph"><div class="dz-label">🎣 Phishing</div></div>
+      <div class="drop-zone" data-cat="Malware" id="dz2a-mw"><div class="dz-label">🦠 Malware</div></div>
+      <div class="drop-zone" data-cat="DoS" id="dz2a-ds"><div class="dz-label">💥 DoS / DDoS</div></div>
+      <div class="drop-zone" data-cat="Social Engineering" id="dz2a-se"><div class="dz-label">🎭 Social Engineering</div></div>
+    </div>
+    <div class="fb-msg" id="fb2a"></div>
+    <div class="task-actions">
+      <button class="btn btn-primary" id="nx2a" disabled onclick="advTask('t2a','t2b','sp2-1','sp2-2')">Next Task →</button>
+    </div>
+  </div>
+
+  <!-- 2B: CIA MATCHING -->
+  <div class="task-card hidden" id="t2b">
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(168,85,247,.2);color:#c084fc">Task 2B</span>
+      <h3>Match Each Incident to Its CIA Violation</h3>
+    </div>
+    <div class="task-desc">Five DigiCorp incidents this week. Click an incident on the left, then click the CIA principle it most severely violates on the right. One incident may involve all three — pick the <em>primary</em> violation.</div>
+    <div class="task-note">
+      <strong>Confidentiality</strong> = unauthorised access to data &nbsp;|&nbsp; <strong>Integrity</strong> = data altered or corrupted &nbsp;|&nbsp; <strong>Availability</strong> = authorised users cannot access systems when needed
+    </div>
+    <div class="match-wrap" id="mw2b">
+      <div class="match-col" id="mc2b-left">
+        <div class="match-item" data-id="i1" data-ans="Integrity" onclick="mPick(this,'left','mw2b','fb2b','nx2b')">Ransomware encrypts DigiCorp's database files, inserting junk data before locking them</div>
+        <div class="match-item" data-id="i2" data-ans="Confidentiality" onclick="mPick(this,'left','mw2b','fb2b','nx2b')">An ex-employee's account was never deactivated — they downloaded 3,000 customer records</div>
+        <div class="match-item" data-id="i3" data-ans="Availability" onclick="mPick(this,'left','mw2b','fb2b','nx2b')">A DDoS attack takes down the ordering portal for 8 hours during peak sales</div>
+        <div class="match-item" data-id="i4" data-ans="Integrity" onclick="mPick(this,'left','mw2b','fb2b','nx2b')">A buggy developer update silently changes product prices in the database</div>
+        <div class="match-item" data-id="i5" data-ans="Confidentiality" onclick="mPick(this,'left','mw2b','fb2b','nx2b')">Phishing attack tricks a staff member into entering login credentials on a fake portal</div>
+      </div>
+      <div class="match-divider"><div style="font-size:1.4rem;color:var(--grey)">↔</div></div>
+      <div class="match-col" id="mc2b-right">
+        <div class="match-item" data-id="Confidentiality" onclick="mPick(this,'right','mw2b','fb2b','nx2b')">🔒 Confidentiality</div>
+        <div class="match-item" data-id="Integrity" onclick="mPick(this,'right','mw2b','fb2b','nx2b')">✅ Integrity</div>
+        <div class="match-item" data-id="Availability" onclick="mPick(this,'right','mw2b','fb2b','nx2b')">⚡ Availability</div>
+      </div>
+    </div>
+    <div class="fb-msg" id="fb2b"></div>
+    <div class="task-actions">
+      <button class="btn btn-primary" id="nx2b" disabled onclick="advTask('t2b','t2c','sp2-2','sp2-3')">Next Task →</button>
+    </div>
+  </div>
+
+  <!-- 2C: MCQ -->
+  <div class="task-card hidden" id="t2c">
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(168,85,247,.2);color:#c084fc">Task 2C</span>
+      <h3>Cybersecurity — Knowledge Check</h3>
+    </div>
+    <div class="task-desc">Four questions. All must be correct. Options are equally plausible — you need to understand the material to choose correctly.</div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">1. DigiCorp discovers that an attacker copied confidential customer records but did not modify or delete any files. Which cybersecurity objective was primarily compromised?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q2c1','A')">A. Confidentiality — sensitive information was exposed to an unauthorised party despite remaining unchanged</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c1','A')">B. Integrity — data can no longer be trusted because an attacker gained access to the system</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c1','A')">C. Availability — legitimate users were unable to access customer records during the incident</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c1','A')">D. Authentication + Availability — the system could no longer verify the identity of authorised employees</button>
+      </div>
+      <div class="mcq-exp" id="exp-q2c1"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">2. An employee receives an email claiming their account will be suspended unless they immediately log in through a provided link. The login page closely resembles the company's real website. This attack is best described as:</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c2','B')">A. Malware — malicious software automatically installs itself without requiring user interaction</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q2c2','B')">B. Phishing — a fraudulent message attempts to trick to revealing credentials or sensitive data</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c2','B')">C. Denial of Service — attackers overwhelm systems with traffic to disrupt normal operations</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c2','B')">D. Shoulder Surfing — information is obtained by directly observing a user entering credentials</button>
+      </div>
+      <div class="mcq-exp" id="exp-q2c2"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">3. DigiCorp enables two-factor authentication for all remote logins. Why does this significantly improve security even if an employee's password becomes known to an attacker?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c3','D')">A. It automatically changes passwords after every successful login to prevent credential reuse</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c3','D')">B. It encrypts all company data, preventing attackers and hackers from reading confidential information</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c3','D')">C. It prevents employees from accessing company systems from unauthorised locations</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q2c3','D')">D. It requires an additional verification , meaning a password alone is insufficient for access</button>
+      </div>
+      <div class="mcq-exp" id="exp-q2c3"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">4. DigiCorp's security policy requires employees to create strong passwords. Which password follows cybersecurity best practice most closely?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c4','C')">A. DigiCorp2025 — contains a company name and predictable number sequence</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c4','C')">B. Password@ — includes symbols but uses a commonly targeted password pattern</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q2c4','C')">C. DI!gicrop#v2$ — a long, complex and combination of characters</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c4','C')">D. SummerJune2026 — uses meaningful words and dates that may be easier to guess</button>
+      </div>
+      <div class="mcq-exp" id="exp-q2c4"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">5. DigiCorp's security team receives reports that several employee accounts were compromised because staff reused the same password across multiple websites. Which security principle was most directly violated?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c5','C')">A. Encryption — sensitive information should always be protected while stored and transmitted</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c5','C')">B. Availability — systems and services should remain accessible to authorised users when required</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q2c5','C')">C. Strong Authentication — credentials should be unique and difficult for attackers to reuse</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c5','C')">D. Network Monitoring — unusual activity should be identified and reported to administrators</button>
+      </div>
+      <div class="mcq-exp" id="exp-q2c5"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">6. DigiCorp wants a security control that continuously monitors network traffic and generates alerts when suspicious activity matches known attack patterns. Which solution best meets this requirement?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q2c6','A')">A. An Intrusion Detection System (IDS) — it analyses traffic and alerts administrators to potential threats</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c6','A')">B. A Virtual Private Network (VPN) — it creates encrypted connections for remote users accessing company resources</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c6','A')">C. Multi-factor Authentication (MFA) — it verifies user identities using multiple authentication factors</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q2c6','A')">D. Data Backup Software — it creates recoverable copies of information in case of data loss incidents</button>
+      </div>
+      <div class="mcq-exp" id="exp-q2c6"></div>
+    </div>
+
+    <div class="fb-msg" id="fb2c"></div>
+    <div class="task-actions">
+      <button class="btn btn-check" onclick="checkMCQ(['q2c1','q2c2','q2c3','q2c4','q2c5','q2c6'],'fb2c','nx2c')">Submit Answers</button>
+      <button class="btn btn-primary" id="nx2c" disabled onclick="finishMission(2)">Complete Mission 2 ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MISSION 3 ══ -->
+<div id="scr-m3" class="screen">
+  <button class="back-btn" onclick="goHub()">← Mission Hub</button>
+  <div class="mission-hero mh3">
+    <div class="mh-glow"></div>
+    <h2>📋 Mission 3 — Professional Report Writing</h2>
+    <p>Chamari's intern has submitted a client-facing Q3 report and it's a disaster. Client meeting in 3 hours. You need to find every problem, understand the correct process, and produce a properly formatted version.</p>
+  </div>
+  <div class="steps-bar">
+    <div class="step-pill sp-active" id="sp3-1">3A · Spot the Problems</div>
+    <div class="step-pill" id="sp3-2">3B · Formatting Workflow</div>
+    <div class="step-pill" id="sp3-3">3C · Knowledge Check</div>
+    <div class="step-pill" id="sp3-4">3D · Corrected Report</div>
+  </div>
+
+  <!-- 3A: CARD SELECTION -->
+  <div class="task-card" id="t3a">
+    <div class="story-box" style="border-left-color:var(--m3)">
+      <div class="story-avatar">😰</div>
+      <div>
+        <div class="story-name" style="color:var(--m3)">CHAMARI — SENIOR MANAGER</div>
+        <div class="story-text">Ashan sent me the Q3 Client Summary Report and I've counted at least 7 things wrong with it. I don't have time to list them — I need you to find them. The client is coming in 3 hours.</div>
+      </div>
+    </div>
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(20,184,166,.2);color:#2dd4bf">Task 3A</span>
+      <h3>Identify the 7 Problems in Ashan's Report</h3>
+    </div>
+    <div class="task-desc">Below are 10 statements describing aspects of Ashan's document. Exactly 7 are genuine problems. Select them. Three statements describe correct practice — do not select those. Read carefully — some wrong options sound like problems but are not.</div>
+    <div class="cs-grid" id="csg3a">
+      <div class="cs-item" data-ok="1" onclick="csClick(this,'cc3a','7')">
+        <div class="cs-sublabel">Table of Contents</div>
+        The table of contents was typed manually — section titles and page numbers were entered by hand, not generated from Heading styles.
+      </div>
+      <div class="cs-item" data-ok="0" onclick="csClick(this,'cc3a','7')">
+        <div class="cs-sublabel">Page Orientation</div>
+        The document uses portrait orientation with A4 paper size throughout.
+      </div>
+      <div class="cs-item" data-ok="1" onclick="csClick(this,'cc3a','7')">
+        <div class="cs-sublabel">Heading Styles</div>
+        Section headings are formatted by manually bolding and enlarging normal paragraph text, instead of applying Word's built-in Heading 1 and Heading 2 styles.
+      </div>
+      <div class="cs-item" data-ok="1" onclick="csClick(this,'cc3a','7')">
+        <div class="cs-sublabel">Page Numbers</div>
+        Page numbers were typed at the bottom of each page in a text box, rather than inserted using the Header and Footer tool.
+      </div>
+      <div class="cs-item" data-ok="0" onclick="csClick(this,'cc3a','7')">
+        <div class="cs-sublabel">Line Spacing</div>
+        The body text uses 1.5 line spacing consistently throughout the document.
+      </div>
+      <div class="cs-item" data-ok="1" onclick="csClick(this,'cc3a','7')">
+        <div class="cs-sublabel">In-Text Citations</div>
+        Statistics and figures appear in the report body with no in-text citation — sources are listed at the end but not referenced at the point of use.
+      </div>
+      <div class="cs-item" data-ok="1" onclick="csClick(this,'cc3a','7')">
+        <div class="cs-sublabel">Figure Captions</div>
+        Captions for all three charts appear above the figures rather than below them, which is against standard document conventions.
+      </div>
+      <div class="cs-item" data-ok="0" onclick="csClick(this,'cc3a','7')">
+        <div class="cs-sublabel">Margins</div>
+        The document uses 2.54 cm (1 inch) margins on all four sides.
+      </div>
+      <div class="cs-item" data-ok="1" onclick="csClick(this,'cc3a','7')">
+        <div class="cs-sublabel">Reference List Format</div>
+        The reference list mixes Harvard and APA citation formats — some entries use brackets for the year, others place the year at the end.
+      </div>
+      <div class="cs-item" data-ok="1" onclick="csClick(this,'cc3a','7')">
+        <div class="cs-sublabel">Title Page</div>
+        The title page contains the client name and report title but is missing a version number, submission date, and author name.
+      </div>
+    </div>
+    <div class="cs-count">Selected: <span id="cc3a">0</span> / 7</div>
+    <div class="fb-msg" id="fb3a"></div>
+    <div class="task-actions">
+      <button class="btn btn-check" onclick="checkCS('csg3a','fb3a','nx3a',7,'cc3a')">Submit Selection</button>
+      <button class="btn btn-primary" id="nx3a" disabled onclick="advTask('t3a','t3b','sp3-1','sp3-2')">Next Task →</button>
+    </div>
+  </div>
+
+  <!-- 3B: ORDER SORT -->
+  <div class="task-card hidden" id="t3b">
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(20,184,166,.2);color:#2dd4bf">Task 3B</span>
+      <h3>Order the Professional Formatting Workflow</h3>
+    </div>
+    <div class="task-desc">A student has completed a report but all sections are in the wrong order. Arrange the report sections into the correct professional report structure used in academic and business reports.</div>
+    <ul class="sort-list" id="sl3b">
+      <li class="sort-item" draggable="true" data-pos="9">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>Conclusion
+      </li>
+      <li class="sort-item" draggable="true" data-pos="4">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>Table of Contents
+      </li>
+      <li class="sort-item" draggable="true" data-pos="11">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>Appendices
+      </li>
+      <li class="sort-item" draggable="true" data-pos="1">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>Title Page
+      </li>
+      <li class="sort-item" draggable="true" data-pos="7">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>Introduction
+      </li>
+      <li class="sort-item" draggable="true" data-pos="10">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>References
+      </li>
+      <li class="sort-item" draggable="true" data-pos="6">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>List of Tables
+      </li>
+      <li class="sort-item" draggable="true" data-pos="2">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>Executive Summary
+      </li>
+      <li class="sort-item" draggable="true" data-pos="8">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>Main Body of the Report
+      </li>
+      <li class="sort-item" draggable="true" data-pos="3">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>Acknowledgements
+      </li>
+      <li class="sort-item" draggable="true" data-pos="5">
+        <span class="sort-handle">⠿</span><span class="sort-num">?</span>List of Figures
+      </li>
+    </ul>
+    <div class="fb-msg" id="fb3b"></div>
+    <div class="task-actions">
+      <button class="btn btn-check" onclick="checkSort('sl3b','fb3b','nx3b')">Check Order</button>
+      <button class="btn btn-primary" id="nx3b" disabled onclick="advTask('t3b','t3c','sp3-2','sp3-3')">Next Task →</button>
+    </div>
+  </div>
+
+  <!-- 3C: MCQ -->
+  <div class="task-card hidden" id="t3c">
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(20,184,166,.2);color:#2dd4bf">Task 3C</span>
+      <h3>Report Writing — Knowledge Check</h3>
+    </div>
+    <div class="task-desc">Five questions. All must be correct to continue.</div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">1. A student places the Table of Contents before the Executive Summary because both sections appear near the beginning of the document. According to standard report structure, why is this arrangement incorrect?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q3c1','C')">A. The Executive Summary is considered part of the main body and therefore belongs after the Introduction section to provide clear overview of the entire report</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q3c1','C')">B. The Executive Summary is normally placed after the References section to summarise the completed report</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q3c1','C')">C. The Executive Summary should appear before the Table of Contents because it provides overview of the entire report</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q3c1','C')">D. The Executive Summary is only required for business reports and is not considered a standard report section</button>
+      </div>
+      <div class="mcq-exp" id="exp-q3c1"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">2. A report contains several charts and diagrams but does not include a List of Figures. What is the main purpose of including a List of Figures in a professional report?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q3c2','B')">A. To provide detailed explanations of each figure so readers do not need to read the report body</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q3c2','B')">B. To help readers quickly locate figures by displaying their titles and corresponding page numbers</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q3c2','B')">C. To store image sources separately from the reference list and bibliography section of the report</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q3c2','B')">D. To replace captions beneath figures and reduce the amount of text appearing in the document</button>
+      </div>
+      <div class="mcq-exp" id="exp-q3c2"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">3. A report contains excellent research but does not acknowledge any sources used during the investigation. Which section is specifically intended to provide credit for these sources?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q3c3','D')">A. Introduction — it explains the purpose, background and scope of the report topic being examined</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q3c3','D')">B. Executive Summary — it presents a condensed overview of findings, conclusions and recommendations</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q3c3','D')">C. Appendix — it stores supplementary materials that support but are not essential to the report</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q3c3','D')">D. References — it lists all sources cited within the report using a recognised citation style</button>
+      </div>
+      <div class="mcq-exp" id="exp-q3c3"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">4. A student includes detailed survey responses, raw calculations and interview transcripts directly in the main discussion section. Which report section would be the most appropriate location for this material?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q3c4','A')">A. Appendix — supplementary information can be included without interrupting the flow of the report</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q3c4','A')">B. Executive Summary — readers should see supporting evidence before reading the main report content</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q3c4','A')">C. Acknowledgements — supporting materials are normally included alongside appreciation statements</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q3c4','A')">D. Title Page — additional information should appear before the reader reaches the report sections</button>
+      </div>
+      <div class="mcq-exp" id="exp-q3c4"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">5. Which sequence correctly represents the order of the final three major sections in a standard academic or professional report?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q3c5','C')">A. References → Conclusion → Appendix because supporting materials should appear before final remarks</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q3c5','C')">B. Appendix → References → Conclusion because citations are reviewed immediately before closing the report</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q3c5','C')">C. Conclusion → References → Appendix because the report ends with findings before supporting materials</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q3c5','C')">D. Conclusion → Appendix → References because supplementary information must appear before cited sources</button>
+      </div>
+      <div class="mcq-exp" id="exp-q3c5"></div>
+    </div>
+
+    <div class="fb-msg" id="fb3c"></div>
+    <div class="task-actions">
+      <button class="btn btn-check" onclick="checkMCQ(['q3c1','q3c2','q3c3','q3c4','q3c5'],'fb3c','nx3c')">Submit Answers</button>
+      <button class="btn btn-primary" id="nx3c" disabled onclick="advTask('t3c','t3d','sp3-3','sp3-4')">Next Task →</button>
+    </div>
+  </div>
+
+  <!-- 3D: FILE UPLOAD -->
+  <div class="task-card hidden" id="t3d">
+    <div class="story-box" style="border-left-color:var(--m3)">
+      <div class="story-avatar">😰</div>
+      <div>
+        <div class="story-name" style="color:var(--m3)">ASHAN — JUNIOR ASSOCIATE</div>
+        <div class="story-text">I understand everything that was wrong. I don't have time to redo it properly before the meeting — but if you can produce a demo document that shows exactly how it should be formatted, I can use that as my template going forward. Content doesn't matter — structure does.</div>
+      </div>
+    </div>
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(20,184,166,.2);color:#2dd4bf">Task 3D</span>
+      <h3>Produce the Correctly Formatted Report</h3>
+    </div>
+    <div class="task-desc">Create a new Word document demonstrating correct professional report structure. Placeholder text (e.g. Lorem ipsum or short dummy sentences) is fine — the focus is entirely on structure and formatting.</div>
+    <div class="task-note">
+      <strong>Your document must include:</strong><br>
+      • Title page: report title, client name, author name, date, version number (e.g. v1.0)<br>
+      • Automated Table of Contents generated from Heading styles — not typed manually<br>
+      • At least 3 sections using Heading 1 and Heading 2 styles — no manually bolded headings<br>
+      • Page numbers inserted via the Header &amp; Footer tool — not typed in text boxes<br>
+      • At least one figure with a caption below it (inserted via Word's Insert Caption feature)<br>
+      • Consistent margins (2.54 cm), line spacing, and font throughout<br>
+      • Topic: any DigiCorp-related subject of your choice (e.g. "Q3 Performance Report")
+    </div>
+    <div class="criteria-box show" id="cr3d">
+      <h4>📋 Marking Criteria</h4>
+      <ul>
+        <li>Title page contains all 5 required elements (15%)</li>
+        <li>TOC is automated — updating correctly when headings change (25%)</li>
+        <li>All headings use Word Heading styles — no manually formatted bold text (25%)</li>
+        <li>Page numbers correctly inserted via Header/Footer tool (15%)</li>
+        <li>Consistent formatting throughout — font, spacing, margins (20%)</li>
+      </ul>
+    </div>
+    <div class="upload-zone" id="uz3d" onclick="document.getElementById('uf3d').click()" ondragover="dzOver(event,'uz3d')" ondragleave="dzLeave('uz3d')" ondrop="dzDrop(event,'uf3d','uz3d','us3d','nx3d')">
+      <div class="uz-icon">📄</div>
+      <div class="uz-title">Click to upload your Corrected Report</div>
+      <div class="uz-sub">Must be a .docx file</div>
+    </div>
+    <input type="file" id="uf3d" accept=".docx" onchange="fileSelected(this,'uz3d','us3d','nx3d')">
+    <div class="upload-success" id="us3d"><div class="us-text">✅ Document uploaded successfully!</div><div class="us-sub">Marking criteria already visible above. Proceed when ready.</div></div>
+    <div class="task-actions">
+      <button class="btn btn-primary" id="nx3d" disabled onclick="finishMission(3)">Complete Mission 3 ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MISSION 4 ══ -->
+<div id="scr-m4" class="screen">
+  <button class="back-btn" onclick="goHub()">← Mission Hub</button>
+  <div class="mission-hero mh4">
+    <div class="mh-glow"></div>
+    <h2>⚖ Mission 4 — Plagiarism & Digital Ethics</h2>
+    <p>DigiCorp's training division runs an internal learning programme. Four integrity incidents have been reported. You are on the Ethics Committee — your verdicts carry real consequences.</p>
+  </div>
+  <div class="steps-bar">
+    <div class="step-pill sp-active" id="sp4-1">4A · Case Verdicts</div>
+    <div class="step-pill" id="sp4-2">4B · Citation Check</div>
+    <div class="step-pill" id="sp4-3">4C · Knowledge Check</div>
+    <div class="step-pill" id="sp4-4">4D · Paraphrasing</div>
+  </div>
+
+  <!-- 4A: CASE VERDICTS (written) -->
+  <div class="task-card" id="t4a">
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(245,158,11,.2);color:#fbbf24">Task 4A</span>
+      <h3>Rule on the Integrity Cases</h3>
+    </div>
+    <div class="task-desc">Four cases have been reported to the Ethics Committee. For each one, write your verdict and justify your reasoning. A verdict without justification will be rejected. Minimum 40 words per case.</div>
+    <div class="fb-msg fb-warn show" style="margin-bottom:16px">⚠ All four responses must reach 40 words before you can proceed. The button unlocks automatically.</div>
+
+    <div class="case-block">
+      <div class="case-title">Case 1 — The Paraphrase Problem</div>
+      <div class="case-body">Dinusha submitted a 1,500-word report. Turnitin shows 4% similarity. However, manual review reveals that three entire paragraphs restructure sentences from a single textbook — every idea and every example comes directly from that source, just reworded. She has the source in her reference list but no in-text citation pointing to those paragraphs.</div>
+      <div class="case-label">Your Verdict & Reasoning</div>
+      <textarea class="resp-area" id="v4a1" placeholder="State plagiarism / not plagiarism / borderline and explain why, with reference to the specific elements of the case..." oninput="wcCheck(this,'wc4a1',40,'m4a-all')"></textarea>
+      <div class="wc-bar" id="wc4a1">0 / 40 words</div>
+    </div>
+
+    <div class="case-block">
+      <div class="case-title">Case 2 — The AI Submission</div>
+      <div class="case-body">Ranjith's essay is flagged at 87% AI-generated by a detection tool. He claims he used AI only to "help structure his ideas" and then rewrote everything. The writing style shifts dramatically between paragraphs — some read as fluent academic prose, others are clearly a student's own voice. The assessment brief states: "AI tools may be used for research assistance but all written content must be your own."</div>
+      <div class="case-label">Your Verdict & Reasoning</div>
+      <textarea class="resp-area" id="v4a2" placeholder="State your verdict and explain whether this violates the brief's stated AI policy and why..." oninput="wcCheck(this,'wc4a2',40,'m4a-all')"></textarea>
+      <div class="wc-bar" id="wc4a2">0 / 40 words</div>
+    </div>
+
+    <div class="case-block">
+      <div class="case-title">Case 3 — The Recycled Work</div>
+      <div class="case-body">Sameera submitted a report for Module B. Turnitin shows 31% similarity — entirely with her own previous submission for Module A from last semester, both in the same programme. She did not disclose the reuse. The Module B brief states: "Original work produced for this module only."</div>
+      <div class="case-label">Your Verdict & Reasoning</div>
+      <textarea class="resp-area" id="v4a3" placeholder="State your verdict and explain whether reusing your own previous work constitutes an integrity violation, and why..." oninput="wcCheck(this,'wc4a3',40,'m4a-all')"></textarea>
+      <div class="wc-bar" id="wc4a3">0 / 40 words</div>
+    </div>
+
+    <div class="case-block">
+      <div class="case-title">Case 4 — The Collaborative Framework</div>
+      <div class="case-body">Nuwan and Amali discussed their individual assignments together and co-developed an analytical framework. Their submissions use different words and different examples, but the underlying structure and logical flow are identical. Turnitin shows 6% similarity between their submissions. The brief states: individual work only.</div>
+      <div class="case-label">Your Verdict & Reasoning</div>
+      <textarea class="resp-area" id="v4a4" placeholder="State your verdict and explain whether sharing an analytical framework for an individual assignment constitutes collusion..." oninput="wcCheck(this,'wc4a4',40,'m4a-all')"></textarea>
+      <div class="wc-bar" id="wc4a4">0 / 40 words</div>
+    </div>
+
+    <div class="fb-msg" id="fb4a"></div>
+    <div class="task-actions">
+      <button class="btn btn-primary" id="m4a-all" disabled onclick="advTask('t4a','t4b','sp4-1','sp4-2')">Next Task →</button>
+    </div>
+  </div>
+
+  <!-- 4B: CITATION REQUIRED CHECK -->
+  <div class="task-card hidden" id="t4b">
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(245,158,11,.2);color:#fbbf24">Task 4B</span>
+      <h3>Identify Where a Citation is Required</h3>
+    </div>
+
+    <div class="task-desc">
+      Below are 8 situations that may appear in an academic report. Exactly 4 of them require a citation or reference to avoid plagiarism.
+      Select the 4 situations that require a citation.
+    </div>
+
+    <div class="task-note">
+      <strong>Remember:</strong> Citations are required whenever you use information, ideas, statistics, diagrams, or findings obtained from another source. Your own observations, experiences, and original analysis generally do not require citations.
+    </div>
+
+    <div class="cs-grid" id="csg4b">
+
+      <div class="cs-item" data-ok="1" onclick="csClick(this,'cc4b','4')">
+        <div class="cs-sublabel">Scenario 1</div>
+        <span>A student paraphrases information from a journal article and explains it using their own words.</span>
+      </div>
+
+      <div class="cs-item" data-ok="0" onclick="csClick(this,'cc4b','4')">
+        <div class="cs-sublabel">Scenario 2</div>
+        <span>A student describes the results of an experiment they personally conducted.</span>
+      </div>
+
+      <div class="cs-item" data-ok="1" onclick="csClick(this,'cc4b','4')">
+        <div class="cs-sublabel">Scenario 3</div>
+        <span>A student includes statistics obtained from a government website.</span>
+      </div>
+
+      <div class="cs-item" data-ok="0" onclick="csClick(this,'cc4b','4')">
+        <div class="cs-sublabel">Scenario 4</div>
+        <span>A student provides recommendations based on their own analysis of collected data.</span>
+      </div>
+
+      <div class="cs-item" data-ok="1" onclick="csClick(this,'cc4b','4')">
+        <div class="cs-sublabel">Scenario 5</div>
+        <span>A student copies a definition from a textbook into their report.</span>
+      </div>
+
+      <div class="cs-item" data-ok="0" onclick="csClick(this,'cc4b','4')">
+        <div class="cs-sublabel">Scenario 6</div>
+        <span>A student explains their personal reflection on challenges faced during the project.</span>
+      </div>
+
+      <div class="cs-item" data-ok="1" onclick="csClick(this,'cc4b','4')">
+        <div class="cs-sublabel">Scenario 7</div>
+        <span>A student uses a diagram created by another author in their report.</span>
+      </div>
+
+      <div class="cs-item" data-ok="0" onclick="csClick(this,'cc4b','4')">
+        <div class="cs-sublabel">Scenario 8</div>
+        <span>A student summarises findings obtained directly from their own survey responses.</span>
+      </div>
+
+    </div>
+
+    <div class="cs-count">Selected: <span id="cc4b">0</span> / 4</div>
+    <div class="fb-msg" id="fb4b"></div>
+
+    <div class="task-actions">
+      <button class="btn btn-check" onclick="checkCS('csg4b','fb4b','nx4b',4,'cc4b')">Submit Selection</button>
+      <button class="btn btn-primary" id="nx4b" disabled onclick="advTask('t4b','t4c','sp4-2','sp4-3')">Next Task →</button>
+    </div>
+  </div>
+
+  <!-- 4C: MCQ -->
+  <div class="task-card hidden" id="t4c">
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(245,158,11,.2);color:#fbbf24">Task 4C</span>
+      <h3>Ethics & Integrity — Knowledge Check</h3>
+    </div>
+    <div class="task-desc">Four questions. All must be correct.</div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">1. A student rewrites several paragraphs from a journal article using different words and sentence structures but does not provide a citation because no text was copied directly. How should this be viewed?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q4c1','C')">A. Acceptable because changing the wording means the information becomes the student's original work</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q4c1','C')">B. Acceptable because citations are only required when quotation marks are used around copied text</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q4c1','C')">C. Plagiarism because the ideas originated from another source and still require acknowledgement</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q4c1','C')">D. Good academic practice because paraphrasing removes the need for references and citations</button>
+      </div>
+      <div class="mcq-exp" id="exp-q4c1"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">2. A student includes statistics from a research report and provides a reference in the reference list but does not include an in-text citation where the statistics appear. What is the issue?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q4c2','B')">A. No issue exists because the source appears somewhere within the reference list at the end of the document</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q4c2','B')">B. The citation is incomplete because readers cannot identify which information came from that source</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q4c2','B')">C. The reference should be removed because only in-text citations are required in academic reports</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q4c2','B')">D. Statistics are considered common knowledge and therefore never require citations or references</button>
+      </div>
+      <div class="mcq-exp" id="exp-q4c2"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">3. Two students work together on an individual assignment and submit reports containing substantially similar analysis, conclusions and recommendations. Which academic integrity concern is most relevant?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" onclick="mcqPick(this,'q4c3','D')">A. Copyright infringement because both students submitted documents using the same file format</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q4c3','D')">B. Referencing error because similar conclusions always require additional sources to support them</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q4c3','D')">C. Data fabrication because students are expected to reach completely different conclusions</button>
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q4c3','D')">D. Plagiarism because students collaborated on work that was intended to be completed individually</button>
+      </div>
+      <div class="mcq-exp" id="exp-q4c3"></div>
+    </div>
+
+    <div class="mcq-block">
+      <div class="mcq-q">4. A student generates content using an AI writing tool and submits it as entirely their own original work without following institutional guidance or acknowledgement requirements. Why could this be problematic?</div>
+      <div class="mcq-opts">
+        <button class="mcq-opt" data-correct onclick="mcqPick(this,'q4c4','A')">A. It may breach academic integrity requirements because the source of the work has not been disclosed</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q4c4','A')">B. AI-generated content is automatically copyrighted and therefore cannot be used in education</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q4c4','A')">C. Academic institutions prohibit all forms of technology assistance regardless of the assessment type</button>
+        <button class="mcq-opt" onclick="mcqPick(this,'q4c4','A')">D. AI-generated content is always factually correct and therefore cannot be critically evaluated by lecturers</button>
+      </div>
+      <div class="mcq-exp" id="exp-q4c4"></div>
+    </div>
+
+    <div class="fb-msg" id="fb4c"></div>
+    <div class="task-actions">
+      <button class="btn btn-check" onclick="checkMCQ(['q4c1','q4c2','q4c3','q4c4'],'fb4c','nx4c')">Submit Answers</button>
+      <button class="btn btn-primary" id="nx4c" disabled onclick="advTask('t4c','t4d','sp4-3','sp4-4')">Next Task →</button>
+    </div>
+  </div>
+
+  <!-- 4D: PARAPHRASE + UPLOAD -->
+  <div class="task-card hidden" id="t4d">
+    <div class="story-box" style="border-left-color:var(--m4)">
+      <div class="story-avatar">👩‍🏫</div>
+      <div>
+        <div class="story-name" style="color:var(--m4)">MS. WICKRAMA — MODULE TUTOR</div>
+        <div class="story-text">A colleague's draft report contains a paragraph that is too close to the original source. It needs to be properly paraphrased before it can be submitted. Can you rewrite it, then produce a Word document with your paraphrased version and a Harvard in-text citation?</div>
+      </div>
+    </div>
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(245,158,11,.2);color:#fbbf24">Task 4D</span>
+      <h3>Paraphrase & Upload</h3>
+    </div>
+    <div class="task-note">
+      <strong>Original paragraph (textbook source):</strong><br><br>
+      <em>"A firewall is a network security device that monitors incoming and outgoing traffic and decides whether to allow or block specific traffic based on a defined set of security rules. Firewalls have been a first line of defence in network security for over 25 years. They establish a barrier between secured internal networks and untrusted outside networks, such as the internet."</em>
+    </div>
+    <div style="margin-bottom:14px">
+      <div class="case-label" style="margin-bottom:6px">Rewrite the paragraph in your own words (minimum 40 words)</div>
+      <textarea class="resp-area" id="par4d" placeholder="Rewrite using different sentence structure and vocabulary, while keeping the same meaning..." oninput="wcCheck(this,'wc4d',40,null)"></textarea>
+      <div class="wc-bar" id="wc4d">0 / 40 words</div>
+    </div>
+
+    <div id="simResult" style="display:none">
+      <div class="sim-meter"><div class="sim-fill" id="simFill" style="width:0%"></div></div>
+      <div class="fb-msg show" id="fb4d-sim"></div>
+    </div>
+
+    <div class="task-actions" id="ta4d-check">
+      <button class="btn btn-check" onclick="checkPara()">Check My Paraphrase</button>
+    </div>
+
+    <div id="ta4d-upload" style="display:none;margin-top:16px">
+      <div class="criteria-box show">
+        <h4>📝 Now produce the Word document</h4>
+        <ul>
+          <li>Open Microsoft Word and write your paraphrased paragraph (the one above, or an improved version)</li>
+          <li>Add a Harvard in-text citation after the paraphrased text — e.g. (Surname, Year, p.XX)</li>
+          <li>Include a reference list entry for the source at the end of the document</li>
+          <li>Save and upload the .docx file below</li>
+        </ul>
+      </div>
+      <div class="upload-zone" id="uz4d" onclick="document.getElementById('uf4d').click()" ondragover="dzOver(event,'uz4d')" ondragleave="dzLeave('uz4d')" ondrop="dzDrop(event,'uf4d','uz4d','us4d','nx4d')">
+        <div class="uz-icon">📄</div>
+        <div class="uz-title">Upload your paraphrased paragraph document</div>
+        <div class="uz-sub">.docx files only</div>
+      </div>
+      <input type="file" id="uf4d" accept=".docx" onchange="fileSelected(this,'uz4d','us4d','nx4d')">
+      <div class="upload-success" id="us4d"><div class="us-text">✅ Document uploaded!</div></div>
+      <div class="task-actions">
+        <button class="btn btn-primary" id="nx4d" disabled onclick="finishMission(4)">Complete Mission 4 ✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MISSION 5 ══ -->
+<div id="scr-m5" class="screen">
+  <button class="back-btn" onclick="goHub()">← Mission Hub</button>
+  <div class="mission-hero mh5">
+    <div class="mh-glow"></div>
+    <h2>🏆 Mission 5 — The Big Case</h2>
+    <p>A major incident has hit DigiCorp. Everything from all four missions converges here. The Board needs your full advisory report by end of day. This is your final test.</p>
+  </div>
+  <div class="steps-bar">
+    <div class="step-pill sp-active" id="sp5-1">5A · Cross-Domain Analysis</div>
+    <div class="step-pill" id="sp5-2">5B · Priority Ranking</div>
+    <div class="step-pill" id="sp5-3">5C · Board Report</div>
+  </div>
+
+  <!-- 5A: WRITTEN CROSS-ANALYSIS -->
+  <div class="task-card" id="t5a">
+    <div class="story-box" style="border-left-color:var(--m5)">
+      <div class="story-avatar">👔</div>
+      <div>
+        <div class="story-name" style="color:var(--m5)">NIMAL — CEO, DIGICORP</div>
+        <div class="story-text">Last night we discovered a serious breach. An ex-employee accessed our systems using credentials that were never revoked, downloaded 8,000 customer records, and leaked a poorly formatted internal strategy document to a competitor — it had no access controls, no version number, and was saved on a shared drive. Three junior staff also used AI to write the data analysis section of a board report and submitted it as their own. I need your complete analysis before the emergency board meeting. This touches everything.</div>
+      </div>
+    </div>
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(244,63,94,.2);color:#fb7185">Task 5A</span>
+      <h3>Cross-Domain Incident Analysis</h3>
+    </div>
+    <div class="task-desc">This incident cuts across all four subject areas. Analyse each dimension. Minimum 60 words per section — shallow analysis will not pass.</div>
+    <div class="fb-msg fb-warn show" style="margin-bottom:16px">⚠ All four analyses must reach 60 words before you can proceed.</div>
+
+    <div class="case-block">
+      <div class="case-title" style="color:#fb7185">Analysis 1 — IT Systems Dimension</div>
+      <div class="case-body">What does this incident reveal about failures in DigiCorp's information systems? Which specific component or process failed and what should have been in place?</div>
+      <textarea class="resp-area" id="a5a1" placeholder="Analyse the systems failure — consider user account management, access controls, data storage architecture, and system design weaknesses..." oninput="wcCheck(this,'wc5a1',60,'m5a-all')"></textarea>
+      <div class="wc-bar" id="wc5a1">0 / 60 words</div>
+    </div>
+
+    <div class="case-block">
+      <div class="case-title" style="color:#fb7185">Analysis 2 — Cybersecurity Dimension</div>
+      <div class="case-body">Which CIA Triad principles were violated? For each violation, provide the specific evidence from the scenario and classify the attack or failure type.</div>
+      <textarea class="resp-area" id="a5a2" placeholder="Identify which CIA principles were broken with evidence from the scenario, and classify each security failure type..." oninput="wcCheck(this,'wc5a2',60,'m5a-all')"></textarea>
+      <div class="wc-bar" id="wc5a2">0 / 60 words</div>
+    </div>
+
+    <div class="case-block">
+      <div class="case-title" style="color:#fb7185">Analysis 3 — Document Management Dimension</div>
+      <div class="case-body">What document management failures contributed to this incident? What specific controls — including Word features and professional document standards — should have been in place?</div>
+      <textarea class="resp-area" id="a5a3" placeholder="Analyse the document management failures and identify the specific controls that would have prevented or limited the damage..." oninput="wcCheck(this,'wc5a3',60,'m5a-all')"></textarea>
+      <div class="wc-bar" id="wc5a3">0 / 60 words</div>
+    </div>
+
+    <div class="case-block">
+      <div class="case-title" style="color:#fb7185">Analysis 4 — Ethics & Integrity Dimension</div>
+      <div class="case-body">The junior staff submitted AI-generated content to the Board without disclosure. Is this plagiarism, professional misconduct, or something else? What ethical obligations did they have and why did they fail?</div>
+      <textarea class="resp-area" id="a5a4" placeholder="Classify the ethical and integrity failure, identify the obligations that were breached, and explain the implications for professional trust..." oninput="wcCheck(this,'wc5a4',60,'m5a-all')"></textarea>
+      <div class="wc-bar" id="wc5a4">0 / 60 words</div>
+    </div>
+
+    <div class="task-actions">
+      <button class="btn btn-primary" id="m5a-all" disabled onclick="advTask('t5a','t5b','sp5-1','sp5-2')">Next Task →</button>
+    </div>
+  </div>
+
+  <!-- 5B: RANKING -->
+  <div class="task-card hidden" id="t5b">
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(244,63,94,.2);color:#fb7185">Task 5B</span>
+      <h3>Prioritise the Board Recommendations</h3>
+    </div>
+    <div class="task-desc">The Board can only immediately action three of the five recommendations. Drag to rank all five in priority order (1 = most urgent). You will need to justify your top recommendation in the final report.</div>
+    <ul class="rank-list" id="rl5b">
+      <li class="rank-item" draggable="true" data-id="r1">
+        <span class="rank-num" id="rn-r1">1</span>Implement automated account deactivation — all credentials disabled immediately upon any employment termination
+      </li>
+      <li class="rank-item" draggable="true" data-id="r2">
+        <span class="rank-num" id="rn-r2">2</span>Enforce document classification and access controls on all internal strategy and confidential documents
+      </li>
+      <li class="rank-item" draggable="true" data-id="r3">
+        <span class="rank-num" id="rn-r3">3</span>Issue a mandatory company-wide AI usage policy with clear boundaries for professional reporting
+      </li>
+      <li class="rank-item" draggable="true" data-id="r4">
+        <span class="rank-num" id="rn-r4">4</span>Conduct a full audit of all active user credentials against current employee records immediately
+      </li>
+      <li class="rank-item" draggable="true" data-id="r5">
+        <span class="rank-num" id="rn-r5">5</span>Mandatory cybersecurity and digital ethics training for all staff, completed within 30 days
+      </li>
+    </ul>
+    <div class="task-note">There is no single correct ranking — the Board will assess whether your order is logically defensible. Be ready to justify your top priority in the final report.</div>
+    <div class="task-actions">
+      <button class="btn btn-primary" onclick="advTask('t5b','t5c','sp5-2','sp5-3')">Accept Ranking → Final Report</button>
+    </div>
+  </div>
+
+  <!-- 5C: FINAL REPORT UPLOAD -->
+  <div class="task-card hidden" id="t5c">
+    <div class="task-hdr">
+      <span class="task-badge" style="background:rgba(244,63,94,.2);color:#fb7185">Task 5C</span>
+      <h3>The Board Advisory Report</h3>
+    </div>
+    <div class="task-desc">This is your final deliverable for the entire programme. Produce a formal Board Advisory Report synthesising your findings from all five missions into one professional document. This must be your most complete piece of work.</div>
+    <div class="task-note">
+      <strong>Your Board Advisory Report must include:</strong><br>
+      • Cover page: title, date, author, classification marking, version, document reference number<br>
+      • Automated Table of Contents (from Heading styles — not typed)<br>
+      • Executive Summary (max 1 page): what happened, why it matters, what is recommended<br>
+      • Section 1 — IT Systems Analysis: what system failures enabled the breach<br>
+      • Section 2 — Cybersecurity Assessment: full CIA Triad analysis with evidence<br>
+      • Section 3 — Document Management Failures: what was missing and what should replace it<br>
+      • Section 4 — Ethics & Integrity Review: your reasoned verdict on the AI submission<br>
+      • Section 5 — Recommendations: your top 3 in ranked order with justification for each<br>
+      • Section 6 — Implementation Timeline: a formatted table of when each action should be taken<br>
+      • Reference List: all sources cited in Harvard style<br>
+      • <strong>Minimum 1,000 words. Professional tone. All Word formatting requirements applied.</strong>
+    </div>
+    <div class="upload-zone" id="uz5c" onclick="document.getElementById('uf5c').click()" ondragover="dzOver(event,'uz5c')" ondragleave="dzLeave('uz5c')" ondrop="dzDrop(event,'uf5c','uz5c','us5c','nx5c')">
+      <div class="uz-icon">🏛</div>
+      <div class="uz-title">Upload your Board Advisory Report</div>
+      <div class="uz-sub">.docx file · this is your final submission</div>
+    </div>
+    <input type="file" id="uf5c" accept=".docx" onchange="fileSelected(this,'uz5c','us5c','nx5c')">
+    <div class="upload-success" id="us5c"><div class="us-text">✅ Report submitted!</div><div class="us-sub">Marking criteria will be revealed after clicking Complete below.</div></div>
+    <div class="criteria-box" id="cr5c">
+      <h4>📋 Board Report Marking Criteria</h4>
+      <ul>
+        <li>Cover page &amp; TOC complete and correctly formatted (10%)</li>
+        <li>Executive summary clear, accurate, within one page (10%)</li>
+        <li>IT Systems Analysis identifies specific failures with evidence (15%)</li>
+        <li>CIA Triad analysis correctly applied with evidence for each violation (20%)</li>
+        <li>Document management failures identified with specific corrective measures (15%)</li>
+        <li>Ethics analysis includes reasoned verdict with reference to policy (15%)</li>
+        <li>Recommendations ranked, justified, and actionable with realistic timeline (15%)</li>
+      </ul>
+    </div>
+    <div class="task-actions">
+      <button class="btn btn-primary" id="nx5c" disabled onclick="finishMission(5)">Submit Final Report ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ COMPLETION ══ -->
+<div id="scr-complete" class="screen">
+  <div class="completion-screen">
+    <div class="cs-glow"></div>
+    <div class="cs-trophy">🏆</div>
+    <div class="cs-title">Programme Complete</div>
+    <p class="cs-sub">You've completed all five DigiCorp missions and applied knowledge from all four lecture modules in realistic professional scenarios.</p>
+    <div class="cs-score" id="final-sc">0</div>
+    <div class="cs-score-label">points earned · <span id="final-max">635</span> maximum</div>
+    <div class="badges-grid">
+      <div class="badge-chip"><div class="badge-ic">🖥</div><div class="badge-lb">IT Analyst</div></div>
+      <div class="badge-chip"><div class="badge-ic">🔐</div><div class="badge-lb">Security Investigator</div></div>
+      <div class="badge-chip"><div class="badge-ic">📋</div><div class="badge-lb">Document Specialist</div></div>
+      <div class="badge-chip"><div class="badge-ic">⚖</div><div class="badge-lb">Ethics Officer</div></div>
+      <div class="badge-chip"><div class="badge-ic">🏛</div><div class="badge-lb">Board Consultant</div></div>
+    </div>
+    <div class="cs-credit">Created by <strong>Razeen Ramzy</strong> · DigiCorp Interactive Learning System · 2025</div>
+  </div>
+</div>
+
+</div><!-- /app -->
+<div id="confetti-wrap" class="confetti-wrap"></div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+let score = 0;
+let mdone = {1:false,2:false,3:false,4:false,5:false};
+let doneTasks = 0;
+const TOTAL_TASKS = 17;
+const MAX_SCORE = 635;
+
+// score breakdown: completeMission*5×100=500, drop×2×5=10, sort×2×5=10, mcq×4×10=40, cs×2×10=20, match×1×10=10, upload×3×15=45 → 635
+
+// ════════════════════════════════════════════════════════
+// LOADING
+// ════════════════════════════════════════════════════════
+const loadSteps = [
+  [15,'Initialising secure environment...'],
+  [35,'Loading mission data...'],
+  [55,'Preparing interactive tasks...'],
+  [75,'Setting up DigiCorp systems...'],
+  [90,'Running final checks...'],
+  [100,'Ready. Welcome to DigiCorp.']
+];
+window.addEventListener('load', () => {
+  const lf = document.getElementById('lf');
+  const ls = document.getElementById('ls');
+  let i = 0;
+  const tick = () => {
+    if (i >= loadSteps.length) {
+      setTimeout(() => {
+        const ld = document.getElementById('loading');
+        ld.style.opacity = '0';
+        setTimeout(() => {
+          ld.style.display = 'none';
+          document.getElementById('app').style.display = 'block';
+          showScr('scr-welcome');
+        }, 700);
+      }, 300);
+      return;
+    }
+    lf.style.width = loadSteps[i][0] + '%';
+    ls.textContent = loadSteps[i][1];
+    i++;
+    setTimeout(tick, 480);
+  };
+  setTimeout(tick, 200);
+});
+
+// ════════════════════════════════════════════════════════
+// SCREEN MANAGEMENT
+// ════════════════════════════════════════════════════════
+function showScr(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function startApp() {
+  document.getElementById('topbar').style.display = 'flex';
+  showScr('scr-hub');
+  updateBar();
+}
+
+function goHub() {
+  showScr('scr-hub');
+  document.getElementById('tb-lbl').textContent = 'Mission Hub';
+  updateBar();
+}
+
+function openM(n) {
+  if (n > 1 && !mdone[n-1]) return;
+  showScr('scr-m'+n);
+  document.getElementById('tb-lbl').textContent = 'Mission ' + n;
+  updateBar();
+}
+
+function updateBar() {
+  document.getElementById('tb-sc').textContent = 'Score: ' + score;
+  const pct = Math.round((doneTasks / TOTAL_TASKS) * 100);
+  document.getElementById('tbf').style.width = pct + '%';
+}
+
+// ════════════════════════════════════════════════════════
+// TASK NAVIGATION
+// ════════════════════════════════════════════════════════
+function advTask(hideId, showId, stepFrom, stepTo) {
+  document.getElementById(hideId).classList.add('hidden');
+  const next = document.getElementById(showId);
+  if (next) {
+    next.classList.remove('hidden');
+    setTimeout(() => next.scrollIntoView({behavior:'smooth', block:'start'}), 50);
+  }
+  const sf = document.getElementById(stepFrom);
+  const st = document.getElementById(stepTo);
+  if (sf) { sf.classList.remove('sp-active'); sf.classList.add('sp-done'); }
+  if (st) st.classList.add('sp-active');
+  doneTasks++;
+  updateBar();
+}
+
+function finishMission(n) {
+  mdone[n] = true;
+  score += 100;
+  doneTasks++;
+  updateBar();
+
+  // update steps bar
+  const lastStep = document.querySelector('#scr-m'+n+' .step-pill.sp-active');
+  if (lastStep) { lastStep.classList.remove('sp-active'); lastStep.classList.add('sp-done'); }
+
+  // update hub card
+  const mc = document.getElementById('hmc'+n);
+  const bs = document.getElementById('hbs'+n);
+  if (mc) { mc.classList.remove('mc-open'); mc.classList.add('mc-done'); }
+  if (bs) { bs.className = 'mc-badge mc-done-badge'; bs.textContent = '✓ Done'; }
+
+  // unlock next
+  if (n < 5) {
+    const nm = document.getElementById('hmc'+(n+1));
+    const ns = document.getElementById('hbs'+(n+1));
+    if (nm) nm.classList.add('mc-open');
+    if (ns) { ns.className = 'mc-badge mc-open-badge'; ns.textContent = 'Open'; }
+  }
+
+  if (n === 5) {
+    launchConfetti();
+    setTimeout(() => {
+      document.getElementById('final-sc').textContent = score;
+      document.getElementById('cr5c').classList.add('show');
+      showScr('scr-complete');
+    }, 800);
+  } else {
+    goHub();
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// FEEDBACK HELPER
+// ════════════════════════════════════════════════════════
+function fb(id, ok, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'fb-msg show ' + (ok ? 'fb-ok' : 'fb-err');
+  el.textContent = msg;
+}
+
+// ════════════════════════════════════════════════════════
+// DRAG & DROP — CLASSIFY
+// ════════════════════════════════════════════════════════
+let dragEl = null;
+
+document.addEventListener('dragstart', e => {
+  const t = e.target.closest('.drag-chip');
+  if (t && !t.classList.contains('chip-ok')) {
+    dragEl = t;
+    t.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  }
+}, true);
+
+document.addEventListener('dragend', e => {
+  const t = e.target.closest('.drag-chip');
+  if (t) t.classList.remove('dragging');
+  dragEl = null;
+});
+
+document.querySelectorAll('.drop-zone').forEach(zone => {
+  zone.addEventListener('dragover', e => {
+    e.preventDefault();
+    zone.classList.add('dz-over');
+  });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dz-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dz-over');
+    if (!dragEl) return;
+
+    const itemCat = dragEl.dataset.cat;
+    const zoneCat = zone.dataset.cat;
+
+    if (itemCat === zoneCat) {
+      dragEl.classList.add('chip-ok');
+      dragEl.classList.remove('chip-err');
+      dragEl.draggable = false;
+    } else {
+      dragEl.classList.add('chip-err');
+      dragEl.classList.remove('chip-ok');
+      dragEl.draggable = true;
+    }
+    zone.appendChild(dragEl);
+    dragEl = null;
+
+    checkDropAll();
+  });
+});
+
+function checkDropAll() {
+  // Mission 1A
+  const pool1 = document.getElementById('pool1a');
+  const pool2 = document.getElementById('pool2a');
+
+  if (pool1) {
+    const inPools1 = pool1.querySelectorAll('.drag-chip').length;
+    const allDropped1 = document.querySelectorAll('#scr-m1 .drop-zone .drag-chip').length;
+    if (allDropped1 === 12 && inPools1 === 0) {
+      const hasErr = document.querySelectorAll('#scr-m1 .drop-zone .chip-err').length > 0;
+      if (!hasErr) {
+        fb('fb1a', true, '✅ All 12 components correctly classified. The audit documentation is ready.');
+        document.getElementById('nx1a').disabled = false;
+        score += 5; updateBar();
+      } else {
+        fb('fb1a', false, '❌ Some items are in the wrong category (shown in red). Move them to the correct category — drag them directly between zones.');
+        document.getElementById('nx1a').disabled = true;
+      }
+    }
+  }
+
+  if (pool2) {
+    const inPools2 = pool2.querySelectorAll('.drag-chip').length;
+    const allDropped2 = document.querySelectorAll('#scr-m2 .drop-zone .drag-chip').length;
+    if (allDropped2 === 8 && inPools2 === 0) {
+      const hasErr2 = document.querySelectorAll('#scr-m2 .drop-zone .chip-err').length > 0;
+      if (!hasErr2) {
+        fb('fb2a', true, '✅ All 8 alerts correctly categorised. Note how social engineering and phishing share characteristics — the key is the attack vector.');
+        document.getElementById('nx2a').disabled = false;
+        score += 5; updateBar();
+      } else {
+        fb('fb2a', false, '❌ Some alerts are misclassified (shown in red). Move them to the correct category — drag between zones to fix.');
+        document.getElementById('nx2a').disabled = true;
+      }
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// ORDER SORT
+// ════════════════════════════════════════════════════════
+let sortDrag = null;
+
+document.addEventListener('dragstart', e => {
+  const t = e.target.closest('.sort-item, .rank-item');
+  if (t) {
+    sortDrag = t;
+    t.classList.add('dragging-sort', 'dragging-rank');
+    e.dataTransfer.effectAllowed = 'move';
+  }
+}, true);
+
+document.addEventListener('dragend', e => {
+  if (sortDrag) {
+    sortDrag.classList.remove('dragging-sort', 'dragging-rank');
+    sortDrag = null;
+  }
+});
+
+document.addEventListener('dragover', e => {
+  const t = e.target.closest('.sort-item, .rank-item');
+  if (t && sortDrag && t !== sortDrag) {
+    e.preventDefault();
+    const list = t.parentNode;
+    const items = [...list.children];
+    const di = items.indexOf(sortDrag);
+    const ti = items.indexOf(t);
+    if (di < ti) list.insertBefore(sortDrag, t.nextSibling);
+    else list.insertBefore(sortDrag, t);
+    // update rank numbers
+    if (list.classList.contains('rank-list')) {
+      [...list.children].forEach((item, i) => {
+        const rn = item.querySelector('[id^="rn-"]');
+        if (rn) rn.textContent = i + 1;
+      });
+    }
+  }
+});
+
+function checkSort(listId, fbId, nextId) {
+  const list = document.getElementById(listId);
+  const items = [...list.children];
+  let allOk = true;
+  items.forEach((item, i) => {
+    const expected = parseInt(item.dataset.pos);
+    const actual = i + 1;
+    const num = item.querySelector('.sort-num');
+    item.classList.remove('si-ok', 'si-err');
+    if (expected === actual) {
+      item.classList.add('si-ok');
+      if (num) num.textContent = actual;
+    } else {
+      item.classList.add('si-err');
+      if (num) num.textContent = '✗';
+      allOk = false;
+    }
+  });
+  if (allOk) {
+    fb(fbId, true, '✅ Correct sequence! Every step is in the right place.');
+    document.getElementById(nextId).disabled = false;
+    score += 5; updateBar();
+  } else {
+    fb(fbId, false, '❌ Some steps are out of order (marked ✗). Think about dependencies — what must exist before each step can happen? Rearrange and try again.');
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// MCQ
+// ════════════════════════════════════════════════════════
+const mcqState = {};
+
+function mcqPick(btn, qid, correctLetter) {
+  const s = mcqState[qid];
+  if (s && s.locked) return;
+  const opts = btn.closest('.mcq-opts').querySelectorAll('.mcq-opt');
+  opts.forEach(o => o.classList.remove('opt-sel'));
+  btn.classList.add('opt-sel');
+  if (!mcqState[qid]) mcqState[qid] = {};
+  mcqState[qid].btn = btn;
+  mcqState[qid].ok = btn.hasAttribute('data-correct');
+}
+
+function checkMCQ(qids, fbId, nextId) {
+  let unanswered = qids.filter(q => !mcqState[q] || !mcqState[q].btn);
+  if (unanswered.length > 0) {
+    fb(fbId, false, '⚠ Please answer all ' + qids.length + ' questions before submitting.');
+    return;
+  }
+  let allOk = true;
+  const expTxt = {
+    q1c1:'C is correct — software is the set of programs that process data and apply business rules to produce useful output.',
+    q1c2:'B is correct — people who operate the system and enter data are the source of human input errors.',
+    q1c3:'D is correct — formal rules defining how approval must happen before purchasing are procedures.',
+    q1c4:'A is correct — revenue, expenses and profit figures are data: facts used to support decisions.',
+    q1c5:'C is correct — switches, servers and desktops are the physical equipment, i.e. hardware.',
+    q1c6:'B is correct — without trained users, the people component is the weak link even with good software.',
+    q2c1:'A is correct — reading data without authorisation breaks confidentiality, even if nothing is changed.',
+    q2c2:'B is correct — a fraudulent message designed to trick the victim into revealing credentials is phishing.',
+    q2c3:'D is correct — MFA means a stolen password alone is insufficient to gain access.',
+    q2c4:'C is correct — a long, complex, unpredictable string is the strongest password of the options.',
+    q2c5:'C is correct — reusing passwords across sites violates the principle of unique, strong authentication.',
+    q2c6:'A is correct — an IDS continuously analyses traffic and alerts on suspicious patterns.',
+    q3c1:'C is correct — the Executive Summary gives an overview of the whole report and should appear before the TOC.',
+    q3c2:'B is correct — a List of Figures helps readers locate figures via titles and page numbers.',
+    q3c3:'D is correct — the References section lists all cited sources in a recognised citation style.',
+    q3c4:'A is correct — supplementary raw material belongs in the Appendix, not the main discussion.',
+    q3c5:'C is correct — the report ends with Conclusion, then References, then Appendices.',
+    q4c1:'C is correct — paraphrasing still uses another author\'s ideas, so a citation is still required.',
+    q4c2:'B is correct — without an in-text citation, readers cannot tell which content came from that source.',
+    q4c3:'D is correct — submitting near-identical work for an individual assignment is collusion.',
+    q4c4:'A is correct — undisclosed AI-generated work submitted as one\'s own breaches academic integrity requirements.',
+  };
+
+  qids.forEach(qid => {
+    const s = mcqState[qid];
+    const opts = s.btn.closest('.mcq-opts').querySelectorAll('.mcq-opt');
+    opts.forEach(o => { o.classList.remove('opt-sel'); o.classList.add('opt-locked'); });
+    const expEl = document.getElementById('exp-' + qid);
+    if (s.ok) {
+      s.btn.classList.add('opt-correct');
+      if (expEl) { expEl.className = 'mcq-exp show exp-ok'; expEl.textContent = '✓ ' + (expTxt[qid] || 'Correct.'); }
+      s.locked = true;
+    } else {
+      s.btn.classList.add('opt-wrong');
+      opts.forEach(o => { if (o.hasAttribute('data-correct')) o.classList.add('opt-correct'); });
+      if (expEl) { expEl.className = 'mcq-exp show exp-bad'; expEl.textContent = '✗ ' + (expTxt[qid] || 'Incorrect — see highlighted correct answer.'); }
+      allOk = false;
+    }
+  });
+
+  if (allOk) {
+    fb(fbId, true, '✅ All answers correct — you can proceed.');
+    document.getElementById(nextId).disabled = false;
+    score += 10; updateBar();
+  } else {
+    fb(fbId, false, '❌ Some answers are incorrect. The correct answers are highlighted. Fix the wrong ones and resubmit.');
+    // reset wrong ones for retry
+    qids.forEach(qid => {
+      const s = mcqState[qid];
+      if (!s.ok && !s.locked) {
+        const opts = s.btn.closest('.mcq-opts').querySelectorAll('.mcq-opt');
+        opts.forEach(o => { o.classList.remove('opt-locked','opt-correct','opt-wrong','opt-sel'); });
+        const expEl = document.getElementById('exp-' + qid);
+        if (expEl) expEl.className = 'mcq-exp';
+        s.btn = null; s.ok = false;
+      }
+    });
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// CARD SELECTION
+// ════════════════════════════════════════════════════════
+function csClick(item, countId, req) {
+  if (item.classList.contains('cs-locked')) return;
+  item.classList.toggle('cs-sel');
+  const grid = item.closest('.cs-grid');
+  const n = grid.querySelectorAll('.cs-sel').length;
+  document.getElementById(countId).textContent = n;
+}
+
+function checkCS(gridId, fbId, nextId, req, countId) {
+  const grid = document.getElementById(gridId);
+  const items = [...grid.querySelectorAll('.cs-item')];
+  const selected = items.filter(i => i.classList.contains('cs-sel'));
+  if (selected.length !== req) {
+    fb(fbId, false, '⚠ You selected ' + selected.length + ' — exactly ' + req + ' are needed. Some look like problems but are correct practice. Re-read each one.');
+    return;
+  }
+  let allOk = true;
+  items.forEach(item => {
+    const ok = item.dataset.ok === '1';
+    const sel = item.classList.contains('cs-sel');
+    item.classList.remove('cs-sel');
+    item.classList.add('cs-locked');
+    if (ok && sel) item.classList.add('cs-ok');
+    else if (!ok && !sel) item.classList.add('cs-ok');
+    else if (ok && !sel) { item.classList.add('cs-missed'); allOk = false; }
+    else { item.classList.add('cs-wrong'); allOk = false; }
+  });
+  document.getElementById(countId).textContent = req;
+  if (allOk) {
+    fb(fbId, true, '✅ All ' + req + ' problems correctly identified. No false positives.');
+    document.getElementById(nextId).disabled = false;
+    score += 10; updateBar();
+  } else {
+    fb(fbId, false, '❌ Some selections are wrong. Orange = problem you missed. Red = incorrectly selected. The page will reset in 4 seconds — try again.');
+    setTimeout(() => {
+      items.forEach(i => i.classList.remove('cs-ok','cs-missed','cs-wrong','cs-locked'));
+      document.getElementById(countId).textContent = 0;
+      document.getElementById(fbId).className = 'fb-msg';
+    }, 4000);
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// MATCHING
+// ════════════════════════════════════════════════════════
+let mSelLeft = null;
+let mDone = {};
+
+function mPick(item, side, wrapId, fbId, nextId) {
+  if (item.classList.contains('mi-locked')) return;
+  const wrap = document.getElementById(wrapId);
+  if (side === 'left') {
+    wrap.querySelectorAll('#mc2b-left .match-item:not(.mi-locked)').forEach(i => i.classList.remove('mi-sel'));
+    item.classList.add('mi-sel');
+    mSelLeft = item;
+    const rightSel = wrap.querySelector('#mc2b-right .mi-sel');
+    if (rightSel) doMatch(mSelLeft, rightSel, fbId, nextId);
+  } else {
+    wrap.querySelectorAll('#mc2b-right .match-item:not(.mi-locked)').forEach(i => i.classList.remove('mi-sel'));
+    if (!mSelLeft) { item.classList.add('mi-sel'); return; }
+    item.classList.add('mi-sel');
+    doMatch(mSelLeft, item, fbId, nextId);
+  }
+}
+
+function doMatch(left, right, fbId, nextId) {
+  left.classList.remove('mi-sel');
+  right.classList.remove('mi-sel');
+  mSelLeft = null;
+
+  const ans = left.dataset.ans;
+  const chose = right.dataset.id;
+  if (ans === chose) {
+    left.classList.add('mi-ok', 'mi-locked');
+    mDone[left.dataset.id] = true;
+    // check all matched
+    const leftItems = document.querySelectorAll('#mc2b-left .match-item');
+    const allDone = [...leftItems].every(i => i.classList.contains('mi-ok'));
+    if (allDone) {
+      fb(fbId, true, '✅ All five incidents correctly matched to their CIA Triad violation.');
+      document.getElementById(nextId).disabled = false;
+      score += 10; updateBar();
+    }
+  } else {
+    left.classList.add('mi-err');
+    setTimeout(() => left.classList.remove('mi-err'), 500);
+    fb(fbId, false, '❌ Incorrect — think about what was specifically affected: was it who could see the data (Confidentiality), whether the data is accurate (Integrity), or whether authorised users can access it (Availability)?');
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// WORD COUNT
+// ════════════════════════════════════════════════════════
+const wcStatus = {};
+
+function wcCheck(ta, wcId, min, unlockId) {
+  const raw = ta.value.trim();
+  const words = raw.split(/\s+/).filter(x => x.length > 0);
+  const w = words.length;
+
+  // Basic quality guard: enough genuinely distinct, real-length words —
+  // catches gibberish, repeated characters, or filler spam without
+  // needing complex validation.
+  const lower = words.map(x => x.toLowerCase().replace(/[^a-z']/g, ''));
+  const valid = lower.filter(x => x.length > 0);
+  const unique = new Set(valid);
+  const avgLen = valid.length ? valid.reduce((s, x) => s + x.length, 0) / valid.length : 0;
+  const uniqueRatio = valid.length ? unique.size / valid.length : 0;
+  const qualityOk = avgLen >= 3 && uniqueRatio >= 0.4;
+
+  const passed = w >= min && qualityOk;
+
+  const el = document.getElementById(wcId);
+  if (el) {
+    el.className = 'wc-bar' + (passed ? ' wc-ok' : '');
+    if (w >= min && !qualityOk) {
+      el.textContent = w + ' / ' + min + ' words — write a real, varied response';
+    } else {
+      el.textContent = w + ' / ' + min + ' words' + (passed ? ' ✓' : '');
+    }
+  }
+  wcStatus[wcId] = passed;
+  if (unlockId) tryUnlock(unlockId);
+}
+
+function tryUnlock(id) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  let keys = [];
+  if (id === 'm4a-all') keys = ['wc4a1','wc4a2','wc4a3','wc4a4'];
+  if (id === 'm5a-all') keys = ['wc5a1','wc5a2','wc5a3','wc5a4'];
+  btn.disabled = !keys.every(k => wcStatus[k]);
+}
+
+// ════════════════════════════════════════════════════════
+// PARAPHRASE CHECK
+// ════════════════════════════════════════════════════════
+const origText = "A firewall is a network security device that monitors incoming and outgoing traffic and decides whether to allow or block specific traffic based on a defined set of security rules. Firewalls have been a first line of defence in network security for over 25 years. They establish a barrier between secured internal networks and untrusted outside networks such as the internet.";
+const stopWords = new Set(['a','an','the','and','or','but','is','are','was','were','be','been','to','of','in','on','at','for','with','by','from','as','that','this','they','such','over','between','whether','set','been','been']);
+
+function checkPara() {
+  const text = document.getElementById('par4d').value.trim();
+  const w = text.split(/\s+/).filter(x => x.length > 0).length;
+  if (w < 40) {
+    fb('fb4d-sim', false, '⚠ Write at least 40 words before checking.');
+    document.getElementById('simResult').style.display = 'block';
+    return;
+  }
+  const tok = s => s.toLowerCase().replace(/[^a-z\s]/g,'').split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w));
+  const origToks = new Set(tok(origText));
+  const userToks = new Set(tok(text));
+  let overlap = 0;
+  userToks.forEach(t => { if (origToks.has(t)) overlap++; });
+  const sim = Math.round((overlap / origToks.size) * 100);
+
+  document.getElementById('simResult').style.display = 'block';
+  const fill = document.getElementById('simFill');
+  fill.style.width = '0%';
+  fill.style.background = sim > 45 ? '#ef4444' : sim > 30 ? '#eab308' : '#22c55e';
+  setTimeout(() => { fill.style.width = sim + '%'; }, 50);
+
+  if (sim > 45) {
+    fb('fb4d-sim', false, `Similarity: ${sim}% — too close to the original. Change more of the wording and sentence structure, not just individual words.`);
+  } else {
+    fb('fb4d-sim', true, `Similarity: ${sim}% — good paraphrase. The meaning is preserved but the wording is sufficiently different.`);
+    document.getElementById('ta4d-upload').style.display = 'block';
+    document.getElementById('ta4d-check').style.display = 'none';
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// FILE UPLOAD
+// ════════════════════════════════════════════════════════
+function fileSelected(input, zoneId, okId, nextId) {
+  const f = input.files[0];
+  if (!f) return;
+  if (!f.name.toLowerCase().endsWith('.docx')) {
+    alert('Please upload a .docx file — Microsoft Word documents only. Other file types are not accepted.');
+    input.value = '';
+    return;
+  }
+  if (f.size < 500) {
+    alert('This file appears empty or corrupt. Please upload your completed Word document.');
+    input.value = '';
+    return;
+  }
+  document.getElementById(zoneId).style.display = 'none';
+  const ok = document.getElementById(okId);
+  ok.classList.add('show');
+  ok.querySelector('.us-text').textContent = '✅ ' + f.name + ' uploaded successfully!';
+  document.getElementById(nextId).disabled = false;
+  // reveal criteria for 5c
+  const cr = document.getElementById('cr5c');
+  if (cr) cr.classList.add('show');
+  score += 15; updateBar();
+}
+
+function dzOver(e, id) { e.preventDefault(); document.getElementById(id).classList.add('uz-over'); }
+function dzLeave(id) { document.getElementById(id).classList.remove('uz-over'); }
+function dzDrop(e, inputId, zoneId, okId, nextId) {
+  e.preventDefault();
+  document.getElementById(zoneId).classList.remove('uz-over');
+  const f = e.dataTransfer.files[0];
+  if (!f) return;
+  if (!f.name.toLowerCase().endsWith('.docx')) {
+    alert('Please drop a .docx file only.');
+    return;
+  }
+  document.getElementById(zoneId).style.display = 'none';
+  const ok = document.getElementById(okId);
+  ok.classList.add('show');
+  ok.querySelector('.us-text').textContent = '✅ ' + f.name + ' uploaded!';
+  document.getElementById(nextId).disabled = false;
+  const cr = document.getElementById('cr5c');
+  if (cr) cr.classList.add('show');
+  score += 15; updateBar();
+}
+
+// ════════════════════════════════════════════════════════
+// HINT TOGGLE
+// ════════════════════════════════════════════════════════
+function toggleHint(id) {
+  document.getElementById(id).classList.toggle('show');
+}
+
+// ════════════════════════════════════════════════════════
+// CONFETTI
+// ════════════════════════════════════════════════════════
+function launchConfetti() {
+  const wrap = document.getElementById('confetti-wrap');
+  const colours = ['#6366f1','#f97316','#22c55e','#f43f5e','#eab308','#a855f7'];
+  for (let i = 0; i < 80; i++) {
+    setTimeout(() => {
+      const dot = document.createElement('div');
+      dot.className = 'confetti-dot';
+      dot.style.left = Math.random() * 100 + 'vw';
+      dot.style.top = '-10px';
+      dot.style.background = colours[Math.floor(Math.random() * colours.length)];
+      dot.style.animationDuration = (1.5 + Math.random() * 2.5) + 's';
+      dot.style.animationDelay = '0s';
+      dot.style.width = dot.style.height = (6 + Math.random() * 8) + 'px';
+      wrap.appendChild(dot);
+      setTimeout(() => dot.remove(), 4000);
+    }, i * 40);
+  }
+}
+</script>
+<div class="app-watermark">Created By Razeen Ramzy - @IIT</div>
+</body>
+</html>
